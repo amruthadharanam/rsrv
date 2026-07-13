@@ -5,7 +5,7 @@
    shared, free, cloud database so control-panel.html can change
    settings for every customer everywhere (not just one browser).
 
-   ---------------- ONE-TIME SETUP (about 5 minutes) ----------------
+   ---------------- ONE-TIME SETUP (about 5 minutes) ---------------- 
    1. Go to https://console.firebase.google.com and sign in with any
       Google account.
    2. Click "Add project" → give it any name (e.g. "amruthadharanam")
