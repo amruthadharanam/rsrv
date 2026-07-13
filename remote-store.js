@@ -13,16 +13,27 @@ const RemoteStore = {
     _configured: false,
 
     isConfigured() {
-        return FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith("REPLACE_WITH");
+        try {
+            return typeof FIREBASE_CONFIG !== "undefined" && !!FIREBASE_CONFIG.apiKey && !FIREBASE_CONFIG.apiKey.startsWith("REPLACE_WITH");
+        } catch (e) {
+            return false;
+        }
+    },
+
+    // Returns one of: "ok", "not_configured", "missing_config_file",
+    // "missing_sdk" — lets callers show a specific, actionable message
+    // instead of a generic failure.
+    diagnose() {
+        if (typeof FIREBASE_CONFIG === "undefined") return "missing_config_file";
+        if (typeof firebase === "undefined") return "missing_sdk";
+        if (!this.isConfigured()) return "not_configured";
+        return "ok";
     },
 
     init() {
-        this._configured = this.isConfigured();
-        if (!this._configured) {
-            console.warn("Firebase isn't configured yet — see firebase-config.js. Falling back to this-device-only storage.");
-            return false;
-        }
         try {
+            this._configured = this.isConfigured();
+            if (!this._configured) return false;
             if (!firebase.apps || !firebase.apps.length) {
                 firebase.initializeApp(FIREBASE_CONFIG);
             }
