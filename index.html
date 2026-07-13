@@ -3271,31 +3271,37 @@
             // Firebase isn't configured or unreachable, this quietly does
             // nothing and the page keeps working exactly as it already is.
             (async function loadLiveControlPanelSettings() {
-                if (typeof RemoteStore === "undefined" || !RemoteStore.init()) return;
+                try {
+                    if (typeof RemoteStore === "undefined") return;
+                    if (RemoteStore.diagnose() !== "ok") return; // not configured / SDK missing — stays on cache/defaults, silently
+                    if (!RemoteStore.init()) return;
 
-                const refreshAffectedUI = (data) => {
-                    applyOverridesFromRemote(data);
-                    cacheRemoteLocally(data);
-                    UIEngine.renderMenu();
-                    UIEngine.renderMealCardOptions();
-                    UIEngine.renderAnnouncement();
-                    UIEngine.updateKitchenStatus();
-                    const feeInput = document.getElementById("input-delivery-fee");
-                    const remoteDelivery = data.deliveryCharge;
-                    if (feeInput && !POSState._deliveryChargeUserEdited && remoteDelivery !== undefined && remoteDelivery !== null) {
-                        POSState.deliveryCharge = remoteDelivery;
-                        feeInput.value = remoteDelivery;
-                        UIEngine.syncTotals();
-                    }
-                };
+                    const refreshAffectedUI = (data) => {
+                        applyOverridesFromRemote(data);
+                        cacheRemoteLocally(data);
+                        UIEngine.renderMenu();
+                        UIEngine.renderMealCardOptions();
+                        UIEngine.renderAnnouncement();
+                        UIEngine.updateKitchenStatus();
+                        const feeInput = document.getElementById("input-delivery-fee");
+                        const remoteDelivery = data.deliveryCharge;
+                        if (feeInput && !POSState._deliveryChargeUserEdited && remoteDelivery !== undefined && remoteDelivery !== null) {
+                            POSState.deliveryCharge = remoteDelivery;
+                            feeInput.value = remoteDelivery;
+                            UIEngine.syncTotals();
+                        }
+                    };
 
-                const fetched = await RemoteStore.getAll();
-                if (fetched === null) return; // unreachable this time — keep what's already rendered
-                refreshAffectedUI(fetched);
+                    const fetched = await RemoteStore.getAll();
+                    if (fetched === null) return; // unreachable this time — keep what's already rendered
+                    refreshAffectedUI(fetched);
 
-                // Stay in sync live if this page is left open (e.g. store
-                // gets closed, an item sells out, mid-session).
-                RemoteStore.watch(refreshAffectedUI);
+                    // Stay in sync live if this page is left open (e.g. store
+                    // gets closed, an item sells out, mid-session).
+                    RemoteStore.watch(refreshAffectedUI);
+                } catch (e) {
+                    console.warn("Live control panel settings unavailable, using cached/default settings:", e);
+                }
             })();
         });
     </script>
