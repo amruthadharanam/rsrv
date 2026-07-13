@@ -655,35 +655,62 @@
         remote = loadLocalCache();
         renderAll();
 
-        if (!RemoteStore.init()) {
-            banner.className = "conn-banner error";
-            banner.textContent = "⚠️ Not connected to a shared database yet — changes here will only apply on this device. See the setup steps at the top of firebase-config.js.";
-            pill.textContent = "⚠️ This-device-only mode";
-            return;
-        }
+        try {
+            if (typeof RemoteStore === "undefined") {
+                banner.className = "conn-banner error";
+                banner.textContent = "⚠️ remote-store.js didn't load. Make sure it's uploaded in the SAME folder as control-panel.html, with that exact filename.";
+                pill.textContent = "⚠️ This-device-only mode";
+                return;
+            }
 
-        const fetched = await RemoteStore.getAll();
-        if (fetched === null) {
-            banner.className = "conn-banner warn";
-            banner.textContent = "⚠️ Couldn't reach the shared database right now — showing last-known settings from this device. Changes you save will retry automatically the next time you're online.";
-            pill.textContent = "⚠️ Offline — showing cached settings";
-            return;
-        }
+            const diagnosis = RemoteStore.diagnose();
+            if (diagnosis === "missing_config_file") {
+                banner.className = "conn-banner error";
+                banner.textContent = "⚠️ firebase-config.js didn't load. Make sure it's uploaded in the SAME folder as control-panel.html, with that exact filename.";
+                pill.textContent = "⚠️ This-device-only mode";
+                return;
+            }
+            if (diagnosis === "missing_sdk") {
+                banner.className = "conn-banner error";
+                banner.textContent = "⚠️ Couldn't load the Firebase SDK from Google's servers — check your internet connection, or whether something (an ad-blocker, a firewall) is blocking gstatic.com.";
+                pill.textContent = "⚠️ This-device-only mode";
+                return;
+            }
+            if (diagnosis === "not_configured" || !RemoteStore.init()) {
+                banner.className = "conn-banner error";
+                banner.textContent = "⚠️ Not connected to a shared database yet — changes here will only apply on this device. See the setup steps at the top of firebase-config.js.";
+                pill.textContent = "⚠️ This-device-only mode";
+                return;
+            }
 
-        remote = fetched;
-        cacheLocally();
-        renderAll();
-        banner.className = "conn-banner ok";
-        banner.textContent = "✅ Connected — changes here apply to every customer, on every device, right away.";
-        pill.textContent = "🌍 Live for every customer, every device";
+            const fetched = await RemoteStore.getAll();
+            if (fetched === null) {
+                banner.className = "conn-banner warn";
+                banner.textContent = "⚠️ Couldn't reach the shared database right now — showing last-known settings from this device. Changes you save will retry automatically the next time you're online.";
+                pill.textContent = "⚠️ Offline — showing cached settings";
+                return;
+            }
 
-        // Keep this page in sync if it's left open while someone else
-        // (or another tab) changes something.
-        RemoteStore.watch((data) => {
-            remote = data;
+            remote = fetched;
             cacheLocally();
             renderAll();
-        });
+            banner.className = "conn-banner ok";
+            banner.textContent = "✅ Connected — changes here apply to every customer, on every device, right away.";
+            pill.textContent = "🌍 Live for every customer, every device";
+
+            // Keep this page in sync if it's left open while someone else
+            // (or another tab) changes something.
+            RemoteStore.watch((data) => {
+                remote = data;
+                cacheLocally();
+                renderAll();
+            });
+        } catch (e) {
+            console.error("Control panel connection error:", e);
+            banner.className = "conn-banner error";
+            banner.textContent = "⚠️ Something went wrong connecting to the shared database (see browser console for details). Showing last-known settings from this device for now.";
+            pill.textContent = "⚠️ This-device-only mode";
+        }
     })();
 </script>
 </body>
