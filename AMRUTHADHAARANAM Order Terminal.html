@@ -1451,7 +1451,9 @@
                 const textEl = document.getElementById("announcement-text");
                 const ann    = SETTINGS.announcement || {};
 
+                const storageKey = "ad_announcement_dismissed";
                 if (!ann.enabled || !ann.text) {
+                    localStorage.removeItem(storageKey);
                     bar.classList.remove("visible");
                     return;
                 }
@@ -1463,7 +1465,6 @@
                 for (let i = 0; i < fingerprint.length; i++) {
                     hash = (hash * 31 + fingerprint.charCodeAt(i)) | 0;
                 }
-                const storageKey = "ad_announcement_dismissed";
                 const dismissedHash = localStorage.getItem(storageKey);
 
                 if (dismissedHash === String(hash)) {
