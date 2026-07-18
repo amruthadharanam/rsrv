@@ -4,8 +4,8 @@
     "enabled": true,
     "type": "offer",
     "icon": "🎉",
-    "text": "Announcement: <strong>Introducing FUTURE ORDER !</strong>",
-    "blink": true
+    "blink": true,
+    "text": "Announcement: <strong>Introducing FUTURE ORDER !</strong>"
   },
   "whatsapp": "917845387741",
   "upi": "prabhunandhu-2@oksbi",
