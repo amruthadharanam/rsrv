@@ -1,7 +1,7 @@
 {
   "storeClosed": false,
   "announcement": {
-    "enabled": true,
+    "enabled": false,
     "type": "offer",
     "icon": "🎉",
     "blink": true,
