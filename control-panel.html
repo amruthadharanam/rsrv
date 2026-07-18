@@ -1,0 +1,1408 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amruthadharanam — Control Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: #365C46;
+        --primary-deep: #24402E;
+        --secondary: #E6C98F;
+        --background: #FCFAF7;
+        --surface: #FFFFFF;
+        --accent: #B44F2A;
+        --success: #2E7D32;
+        --danger: #C62828;
+        --warning: #9C6B14;
+        --text-main: #2C2A29;
+        --text-muted: #666461;
+        --border: #E8E5E0;
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 16px;
+        --shadow: 0 4px 12px rgba(54, 92, 70, 0.06);
+        --shadow-lift: 0 10px 30px rgba(54, 92, 70, 0.14);
+        --transition: all 0.18s ease-in-out;
+        --font-heading: 'Playfair Display', serif;
+        --font-body: 'Inter', sans-serif;
+        --font-btn: 'Manrope', sans-serif;
+        --font-mono: 'IBM Plex Mono', monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: var(--font-body);
+        background: var(--background);
+        color: var(--text-main);
+        padding-bottom: 4rem;
+    }
+    a { color: inherit; }
+
+    /* ---------- HEADER ---------- */
+    .cp-header {
+        background: linear-gradient(120deg, var(--primary-deep), var(--primary));
+        color: #fff;
+        padding: 2rem 1.5rem 2.4rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .cp-header::after {
+        content: "";
+        position: absolute; inset: 0;
+        background: radial-gradient(circle at 88% -10%, rgba(230,201,143,0.25), transparent 55%);
+        pointer-events: none;
+    }
+    .cp-header-inner {
+        max-width: 980px; margin: 0 auto; position: relative; z-index: 1;
+        display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+    }
+    .cp-title-block h1 {
+        font-family: var(--font-heading); font-weight: 700; font-size: 1.7rem; margin: 0 0 0.25rem;
+        letter-spacing: 0.01em;
+    }
+    .cp-title-block p { margin: 0; font-family: var(--font-btn); font-size: 0.85rem; color: var(--secondary); font-weight: 600; }
+    .cp-scope-pill {
+        font-family: var(--font-mono); font-size: 0.72rem; background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.25); padding: 0.5rem 0.85rem; border-radius: 999px;
+        max-width: 320px; line-height: 1.4;
+    }
+
+    .cp-wrap { max-width: 980px; margin: -1.4rem auto 0; padding: 0 1.5rem; position: relative; z-index: 2; }
+
+    /* ---------- STATUS STRIP ---------- */
+    .status-strip {
+        background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lift);
+        padding: 1.1rem 1.4rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+        border: 1px solid var(--border); margin-bottom: 1.8rem;
+    }
+    .status-dot { width: 11px; height: 11px; border-radius: 50%; background: var(--success); flex-shrink: 0; box-shadow: 0 0 0 4px rgba(46,125,50,0.15); }
+    .status-dot.closed { background: var(--danger); box-shadow: 0 0 0 4px rgba(198,40,40,0.15); }
+    .status-strip strong { font-family: var(--font-btn); }
+    .status-strip .muted { color: var(--text-muted); font-size: 0.85rem; }
+
+    /* ---------- CARDS ---------- */
+    .card {
+        background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+        box-shadow: var(--shadow); padding: 1.6rem; margin-bottom: 1.5rem;
+    }
+    .card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.3rem; flex-wrap: wrap; }
+    .card-head h2 { font-family: var(--font-heading); font-size: 1.25rem; margin: 0; color: var(--primary-deep); }
+    .card-note { color: var(--text-muted); font-size: 0.83rem; margin: 0 0 1.2rem; line-height: 1.5; }
+    .field-row { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.1rem; }
+    .field-row label { font-family: var(--font-btn); font-weight: 700; font-size: 0.82rem; color: var(--text-main); }
+    .field-row .hint { font-size: 0.76rem; color: var(--text-muted); }
+    input[type="text"], input[type="number"], textarea, select {
+        font-family: var(--font-body); font-size: 0.92rem; padding: 0.65rem 0.8rem; border: 1.5px solid var(--border);
+        border-radius: var(--radius-sm); background: var(--background); color: var(--text-main); width: 100%;
+        transition: var(--transition);
+    }
+    input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); background: #fff; }
+    textarea { resize: vertical; min-height: 64px; font-family: var(--font-body); }
+
+    .inline-toggle { display: flex; align-items: center; gap: 0.6rem; }
+    .switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; inset: 0; background: #cfc9bf; border-radius: 999px; cursor: pointer; transition: var(--transition); }
+    .slider::before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: var(--transition); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+    .switch input:checked + .slider { background: var(--primary); }
+    .switch input:checked + .slider::before { transform: translateX(20px); }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.2rem; }
+    .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem 1.2rem; }
+    @media (max-width: 640px) { .row-2, .row-3 { grid-template-columns: 1fr; } }
+
+    .btn { font-family: var(--font-btn); font-weight: 700; font-size: 0.85rem; border: none; border-radius: var(--radius-sm);
+        padding: 0.7rem 1.2rem; cursor: pointer; transition: var(--transition); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-deep); }
+    .btn-ghost { background: transparent; color: var(--text-muted); border: 1.5px solid var(--border); }
+    .btn-ghost:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { filter: brightness(0.92); }
+    .btn-sm { padding: 0.45rem 0.8rem; font-size: 0.76rem; }
+    .btn-row { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 0.4rem; }
+
+    .override-flag {
+        display: inline-block; font-family: var(--font-mono); font-size: 0.68rem; background: var(--secondary);
+        color: var(--primary-deep); padding: 0.15rem 0.5rem; border-radius: 999px; margin-left: 0.5rem; vertical-align: middle;
+    }
+
+    /* ---------- COUPON LIST ---------- */
+    .coupon-row {
+        display: grid; grid-template-columns: 1.1fr 0.9fr 0.7fr 1.4fr auto auto; gap: 0.6rem; align-items: center;
+        padding: 0.7rem 0; border-bottom: 1px solid var(--border);
+    }
+    .coupon-row:last-child { border-bottom: none; }
+    .coupon-row.header-row { font-family: var(--font-btn); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); padding-bottom: 0.5rem; }
+    .coupon-row input, .coupon-row select { padding: 0.45rem 0.6rem; font-size: 0.82rem; }
+    @media (max-width: 800px) {
+        .coupon-row { grid-template-columns: 1fr 1fr; }
+        .coupon-row.header-row { display: none; }
+    }
+    .icon-btn { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--text-muted); padding: 0.3rem; border-radius: var(--radius-sm); }
+    .icon-btn:hover { color: var(--danger); background: rgba(198,40,40,0.08); }
+
+    /* ---------- MENU AVAILABILITY (legacy classes kept) ---------- */
+    .menu-search { margin-bottom: 1rem; }
+    .menu-category-group { margin-bottom: 1.1rem; }
+    .menu-category-group h3 {
+        font-family: var(--font-btn); font-size: 0.86rem; color: var(--primary); margin: 0 0 0.5rem;
+        border-bottom: 1.5px solid var(--border); padding-bottom: 0.4rem;
+    }
+    .menu-item-row {
+        display: flex; align-items: center; justify-content: space-between; gap: 0.8rem;
+        padding: 0.55rem 0.2rem; border-radius: var(--radius-sm);
+    }
+    .menu-item-row:hover { background: var(--background); }
+    .menu-item-row .name { font-size: 0.87rem; }
+    .menu-item-row .price { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-muted); margin-left: 0.5rem; }
+    .menu-item-row.sold-out .name { text-decoration: line-through; color: var(--text-muted); }
+
+    /* ---------- MENU CONTROL (new) ---------- */
+    .mc-filter-row { display: flex; gap: 0.7rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+    .mc-filter-row input { flex: 1; min-width: 160px; margin-bottom: 0; }
+    .mc-mode-tabs { display: flex; gap: 0.35rem; flex-shrink: 0; }
+    .mc-mode-tab {
+        font-family: var(--font-btn); font-size: 0.75rem; font-weight: 700;
+        border: 1.5px solid var(--border); background: var(--background);
+        color: var(--text-muted); padding: 0.4rem 0.75rem;
+        border-radius: 999px; cursor: pointer; transition: var(--transition);
+    }
+    .mc-mode-tab.active  { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .mc-mode-tab:not(.active):hover { border-color: var(--primary); color: var(--primary); }
+
+    .mc-cat-group { margin-bottom: 1.1rem; }
+    .mc-cat-head {
+        font-family: var(--font-btn); font-size: 0.82rem; font-weight: 700; color: var(--primary);
+        padding: 0.4rem 0; border-bottom: 1.5px solid var(--border); margin-bottom: 0.35rem;
+        display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
+    }
+    .mc-item-row {
+        display: grid; grid-template-columns: 1fr auto; gap: 0.4rem 0.8rem; align-items: center;
+        padding: 0.55rem 0.3rem; border-radius: var(--radius-sm); transition: background 0.15s;
+    }
+    .mc-item-row:hover { background: var(--background); }
+    .mc-item-row.mc-hidden .mc-item-name { text-decoration: line-through; color: var(--text-muted); }
+
+    .mc-item-meta { display: flex; align-items: baseline; gap: 0.35rem; flex-wrap: wrap; min-width: 0; }
+    .mc-item-name { font-size: 0.85rem; line-height: 1.4; }
+    .mc-item-price { display: inline-flex; flex-direction: column; gap: 0.12rem; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted); flex-shrink: 0; }
+    .mc-item-price .mc-old-price { text-decoration: line-through; color: var(--text-muted); font-size: 0.7rem; }
+    .mc-item-price .mc-new-price { font-weight: 700; color: var(--primary-deep); }
+    .mc-mode-badge {
+        font-size: 0.63rem; font-weight: 700; font-family: var(--font-btn);
+        padding: 0.1rem 0.42rem; border-radius: 999px; flex-shrink: 0;
+    }
+    .mc-mode-badge.badge-instant { background: rgba(54,92,70,0.13); color: var(--primary-deep); }
+    .mc-mode-badge.badge-future  { background: rgba(148,80,25,0.13); color: var(--accent); }
+    .mc-mode-badge.badge-both    { background: rgba(155,110,20,0.13); color: var(--warning); }
+    .mc-off-badge {
+        font-size: 0.61rem; font-weight: 700; background: rgba(198,40,40,0.1);
+        color: var(--danger); padding: 0.1rem 0.42rem; border-radius: 999px;
+        font-family: var(--font-btn); display: none; flex-shrink: 0;
+    }
+    .mc-item-row.mc-hidden .mc-off-badge { display: inline; }
+
+    .mc-item-controls { display: flex; align-items: center; gap: 0.55rem; flex-wrap: nowrap; justify-content: flex-end; }
+    .mc-days { display: flex; gap: 2px; }
+    .mc-day-lbl {
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 0.6rem; font-weight: 700; font-family: var(--font-btn);
+        color: var(--text-muted); cursor: pointer; width: 26px; height: 26px;
+        border: 1.5px solid var(--border); border-radius: 5px;
+        transition: var(--transition); user-select: none;
+    }
+    .mc-day-lbl.checked { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .mc-day-lbl:not(.checked):hover { border-color: var(--primary); color: var(--primary); }
+    .mc-days-hint { font-size: 0.68rem; color: var(--text-muted); font-style: italic; white-space: nowrap; min-width: 52px; text-align: right; }
+
+    @media (max-width: 640px) {
+        .mc-item-row { grid-template-columns: 1fr; }
+        .mc-item-controls { justify-content: flex-start; flex-wrap: wrap; }
+        .mc-days-hint { min-width: auto; text-align: left; }
+    }
+
+    /* ---------- TOAST ---------- */
+    #toast {
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+        background: var(--primary-deep); color: #fff; font-family: var(--font-btn); font-weight: 600;
+        font-size: 0.85rem; padding: 0.8rem 1.4rem; border-radius: 999px; box-shadow: var(--shadow-lift);
+        opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 999;
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.error { background: var(--danger); }
+
+    .section-anchor-nav {
+        display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0 0 1.6rem;
+    }
+    .section-anchor-nav a {
+        font-family: var(--font-btn); font-size: 0.78rem; font-weight: 700; text-decoration: none;
+        color: var(--primary-deep); background: var(--surface); border: 1.5px solid var(--border);
+        padding: 0.45rem 0.85rem; border-radius: 999px; transition: var(--transition);
+    }
+    .section-anchor-nav a:hover { border-color: var(--primary); background: var(--secondary); }
+</style>
+</head>
+<body>
+
+    <div class="cp-header">
+        <div class="cp-header-inner">
+            <div class="cp-title-block">
+                <h1>🪔 Amruthadharanam Control Panel</h1>
+                <p>Staff settings for the ordering terminal</p>
+            </div>
+            <div class="cp-scope-pill" id="scope-pill">
+                📁 Settings are saved to <strong>settings.json</strong> in the same folder as these files. Start <strong>START_SERVER.bat</strong> (or <code>python server.py</code>) once, then open this page at <code>localhost:8080/control-panel.html</code>. Every save you make here updates the file — customers see changes the next time they load the Order Terminal.
+            </div>
+        </div>
+    </div>
+
+    <div class="cp-wrap">
+
+        <div class="status-strip" id="status-strip">
+            <span class="status-dot" id="status-dot"></span>
+            <strong id="status-text">Loading…</strong>
+            <span class="muted">· Last saved: <span id="last-saved">never this session</span></span>
+        </div>
+
+        <!-- GitHub Pages token config — hidden on local/server, shown on github.io -->
+        <div class="card" id="gh-token-card" style="border-left:3px solid var(--primary); margin-bottom:1rem;">
+            <div class="card-head"><h2>🔑 GitHub Access</h2></div>
+            <p class="card-note">
+                This panel is hosted on GitHub Pages. Every "Save" here commits <code>settings.json</code> straight to your repo using the GitHub API.
+                Create a <strong>Fine-grained Personal Access Token</strong> at
+                <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener noreferrer">github.com/settings/tokens</a>
+                — grant it <strong>Contents: Read and write</strong> for the <code>pos</code> repo only.
+                The token is stored on this device only (localStorage) and sent exclusively to <code>api.github.com</code>.
+            </p>
+            <p class="gh-status-text" style="font-family:var(--font-btn); font-size:0.85rem; margin:0.5rem 0 0.9rem;">⚠️ No token set — saves will fail</p>
+            <div class="row-2">
+                <div class="field-row">
+                    <label for="gh-token-input">Personal Access Token</label>
+                    <input type="password" id="gh-token-input" placeholder="github_pat_…" autocomplete="off">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="saveGitHubToken()">Save token on this device</button>
+                <button class="btn btn-ghost btn-sm" id="gh-clear-btn" onclick="clearGitHubToken()" style="display:none">Clear token</button>
+            </div>
+        </div>
+
+        <nav class="section-anchor-nav">
+            <a href="#sec-store">🏪 Store Status</a>
+            <a href="#sec-announcement">📣 Announcement</a>
+            <a href="#sec-payments">💳 WhatsApp &amp; Payments</a>
+            <a href="#sec-coupons">🏷️ Coupon Codes</a>
+            <a href="#sec-menu">🍽️ Menu Control</a>
+            <a href="#sec-menu-mgr">🧩 Menu Manager</a>
+        </nav>
+
+        <!-- ============ STORE STATUS ============ -->
+        <section class="card" id="sec-store">
+            <div class="card-head"><h2>🏪 Store Status</h2></div>
+            <p class="card-note">
+                Turning this off immediately blocks ordering on this device/site — use it for a sudden closure (staff shortage, running out of stock, unplanned holiday). This does not touch <code>STORE_CONFIG.closedForHoliday</code> in the code, which is for planned closures set in advance.
+            </p>
+            <div class="inline-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="toggle-store-open">
+                    <span class="slider"></span>
+                </label>
+                <label for="toggle-store-open" style="font-family:var(--font-btn); font-weight:700;" id="store-toggle-label">Store is open for ordering</label>
+            </div>
+        </section>
+
+        <!-- ============ ANNOUNCEMENT BANNER ============ -->
+        <section class="card" id="sec-announcement">
+            <div class="card-head">
+                <h2>📣 Announcement Banner</h2>
+                <span id="announcement-override-flag"></span>
+            </div>
+            <p class="card-note">The dismissible banner customers see at the top of the ordering page. Changing the text makes it reappear even for people who dismissed an earlier version.</p>
+
+            <div class="inline-toggle" style="margin-bottom:1.1rem;">
+                <label class="switch"><input type="checkbox" id="ann-enabled"><span class="slider"></span></label>
+                <label for="ann-enabled" style="font-family:var(--font-btn); font-weight:700;">Show banner</label>
+            </div>
+
+            <div class="row-3">
+                <div class="field-row">
+                    <label for="ann-type">Type</label>
+                    <select id="ann-type">
+                        <option value="info">Info (green)</option>
+                        <option value="offer">Offer (gold)</option>
+                        <option value="urgent">Urgent (red)</option>
+                    </select>
+                </div>
+                <div class="field-row">
+                    <label for="ann-icon">Icon (emoji)</label>
+                    <input type="text" id="ann-icon" maxlength="4" placeholder="🎉">
+                </div>
+                <div class="field-row">
+                    <label for="ann-blink">Blinking icon</label>
+                    <div class="inline-toggle">
+                        <label class="switch"><input type="checkbox" id="ann-blink"><span class="slider"></span></label>
+                        <span class="hint">Gently pulses to grab attention</span>
+                    </div>
+                </div>
+            </div>
+            <div class="field-row">
+                <label for="ann-text">Banner text</label>
+                <textarea id="ann-text" placeholder="Announcement: French Vanilla Tea Cake, only ₹40!"></textarea>
+                <span class="hint">Simple HTML is fine, e.g. &lt;strong&gt;bold&lt;/strong&gt;</span>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="saveAnnouncement()">Save banner</button>
+                <button class="btn btn-ghost" onclick="resetAnnouncement()">Reset to code default</button>
+            </div>
+        </section>
+
+        <!-- ============ WHATSAPP / UPI / DELIVERY ============ -->
+        <section class="card" id="sec-payments">
+            <div class="card-head">
+                <h2>💳 WhatsApp &amp; Payments</h2>
+                <span id="payments-override-flag"></span>
+            </div>
+            <p class="card-note">The WhatsApp number every customer's order is sent to, the UPI ID shown for payment, and the default delivery fee applied to new orders.</p>
+            <div class="row-3">
+                <div class="field-row">
+                    <label for="wa-number">Business WhatsApp number</label>
+                    <input type="text" id="wa-number" placeholder="917845387741" inputmode="numeric">
+                    <span class="hint">Country code + number, digits only</span>
+                </div>
+                <div class="field-row">
+                    <label for="upi-vpa">UPI VPA</label>
+                    <input type="text" id="upi-vpa" placeholder="name@bank">
+                </div>
+                <div class="field-row">
+                    <label for="delivery-charge">Default delivery charge (₹)</label>
+                    <input type="number" id="delivery-charge" min="0" step="1" placeholder="0">
+                </div>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="savePayments()">Save</button>
+                <button class="btn btn-ghost" onclick="resetPayments()">Reset all to code defaults</button>
+            </div>
+        </section>
+
+        <!-- ============ COUPON CODES ============ -->
+        <section class="card" id="sec-coupons">
+            <div class="card-head">
+                <h2>🏷️ Coupon Codes</h2>
+                <span id="coupons-override-flag"></span>
+            </div>
+            <p class="card-note">Turn any code off without deleting it, change its discount, or add a brand-new one. Turned-off codes are rejected at checkout as if they didn't exist.</p>
+
+            <div class="coupon-row header-row">
+                <span>Code</span><span>Type</span><span>Value</span><span>Label shown to customer</span><span>Active</span><span></span>
+            </div>
+            <div id="coupon-list"></div>
+
+            <div class="btn-row">
+                <button class="btn btn-ghost btn-sm" onclick="addCouponRow()">+ Add new code</button>
+                <button class="btn btn-primary" onclick="saveCoupons()">Save coupons</button>
+                <button class="btn btn-ghost" onclick="resetCoupons()">Reset all to code defaults</button>
+            </div>
+        </section>
+
+        <!-- ============ MENU CONTROL ============ -->
+        <section class="card" id="sec-menu">
+            <div class="card-head">
+                <h2>🍽️ Menu Control</h2>
+                <span id="menu-override-flag"></span>
+            </div>
+            <p class="card-note">Toggle items on/off and pick which days each one is available. Items turned <strong>off</strong> vanish from the customer menu instantly. Tick specific days to restrict an item to those days only — leave all days unticked for “every day, no restriction”. Items marked <em>off&nbsp;by&nbsp;default</em> in the data file are shown here too, so you can enable them when ready.</p>
+
+            <div class="mc-filter-row">
+                <input type="text" id="menu-search" placeholder="Search dishes…" oninput="renderMenuControl()">
+                <div class="mc-mode-tabs">
+                    <button class="mc-mode-tab active" data-filter="all"     onclick="setMenuModeFilter('all',this)">All</button>
+                    <button class="mc-mode-tab"         data-filter="Instant" onclick="setMenuModeFilter('Instant',this)">⚡ Today's</button>
+                    <button class="mc-mode-tab"         data-filter="Future"  onclick="setMenuModeFilter('Future',this)">📅 Future</button>
+                </div>
+            </div>
+
+            <div id="menu-control-list"></div>
+
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="saveMenuControl()">Save changes</button>
+                <button class="btn btn-ghost"   onclick="resetMenuControl()">Reset all to defaults</button>
+            </div>
+        </section>
+
+        <!-- ============ MENU MANAGER ============ -->
+        <section class="card" id="sec-menu-mgr">
+            <div class="card-head">
+                <h2>🧩 Menu Manager</h2>
+                <span id="mgr-counts"></span>
+            </div>
+            <p class="card-note">Add items to an existing category, create a brand-new category, delete items you no longer want, or mark your staff favourites — all reflected on the Order Terminal instantly after saving.</p>
+
+            <!-- Tab switcher -->
+            <div class="mc-mode-tabs" style="margin-bottom:1.3rem;">
+                <button class="mc-mode-tab active" data-mgr-tab="add"    onclick="showMgrTab('add',this)">➕ Add Item</button>
+                <button class="mc-mode-tab"         data-mgr-tab="manage" onclick="showMgrTab('manage',this)">📋 All Items</button>
+            </div>
+
+            <!-- ── ADD ITEM TAB ── -->
+            <div id="mgr-tab-add">
+                <!-- Category mode radio -->
+                <div style="display:flex;gap:1.4rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;">
+                    <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-family:var(--font-btn);font-weight:700;font-size:0.84rem;">
+                        <input type="radio" name="cat-mode" value="existing" checked onchange="toggleCatMode()"> Add to existing category
+                    </label>
+                    <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-family:var(--font-btn);font-weight:700;font-size:0.84rem;">
+                        <input type="radio" name="cat-mode" value="new" onchange="toggleCatMode()"> Create new category
+                    </label>
+                </div>
+
+                <!-- Existing category picker -->
+                <div id="cat-existing-block" class="field-row" style="margin-bottom:1.1rem;">
+                    <label for="ni-cat-select">Category</label>
+                    <select id="ni-cat-select"><!-- populated by JS --></select>
+                </div>
+
+                <!-- New category inputs -->
+                <div id="cat-new-block" style="display:none;">
+                    <div class="row-2">
+                        <div class="field-row">
+                            <label for="ni-new-cat">New category name <span style="color:var(--danger)">*</span></label>
+                            <input type="text" id="ni-new-cat" placeholder="e.g. Healthy Bowls">
+                        </div>
+                        <div class="field-row">
+                            <label for="ni-new-title">Section heading on terminal</label>
+                            <input type="text" id="ni-new-title" placeholder="e.g. 🥗 Healthy Bowls">
+                            <span class="hint">Leave blank to auto-fill from category name</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item details -->
+                <div class="row-3">
+                    <div class="field-row">
+                        <label for="ni-name">Item name <span style="color:var(--danger)">*</span></label>
+                        <input type="text" id="ni-name" placeholder="e.g. Paneer Tikka Roll">
+                    </div>
+                    <div class="field-row">
+                        <label for="ni-price">Price (₹) <span style="color:var(--danger)">*</span></label>
+                        <input type="number" id="ni-price" min="0" step="1" placeholder="99">
+                    </div>
+                    <div class="field-row">
+                        <label for="ni-old-price">Old price (₹)</label>
+                        <input type="number" id="ni-old-price" min="0" step="1" placeholder="e.g. 129">
+                        <span class="hint">Optional: shown as a strikethrough price when it is higher than the current price.</span>
+                    </div>
+                </div>
+                <div class="row-2">
+                    <div class="field-row">
+                        <label for="ni-modes">Appears in</label>
+                        <select id="ni-modes">
+                            <option value="both">Both — Today's &amp; Future Order</option>
+                            <option value="Instant">⚡ Today's Order only</option>
+                            <option value="Future">📅 Future Order only</option>
+                        </select>
+                    </div>
+                    <div class="field-row" style="flex-direction:row;align-items:center;gap:1.4rem;padding-top:1.4rem;flex-wrap:wrap;">
+                        <div class="inline-toggle">
+                            <label class="switch"><input type="checkbox" id="ni-popular"><span class="slider"></span></label>
+                            <label for="ni-popular" style="font-family:var(--font-btn);font-weight:700;font-size:0.82rem;">Popular ⭐</label>
+                        </div>
+                        <div class="inline-toggle">
+                            <label class="switch"><input type="checkbox" id="ni-fav"><span class="slider"></span></label>
+                            <label for="ni-fav" style="font-family:var(--font-btn);font-weight:700;font-size:0.82rem;">Staff Favourite ★</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="addCustomItem()">➕ Add to menu</button>
+                </div>
+            </div>
+
+            <!-- ── ALL ITEMS TAB ── -->
+            <div id="mgr-tab-manage" style="display:none;">
+                <div class="mc-filter-row">
+                    <input type="text" id="mgr-search" placeholder="Search items…" oninput="renderMgrList()">
+                    <div class="mc-mode-tabs">
+                        <button class="mc-mode-tab active" data-mgr-filter="all"     onclick="setMgrFilter('all',this)">All</button>
+                        <button class="mc-mode-tab"         data-mgr-filter="fav"     onclick="setMgrFilter('fav',this)">★ Favourites</button>
+                        <button class="mc-mode-tab"         data-mgr-filter="deleted" onclick="setMgrFilter('deleted',this)">🗑️ Deleted</button>
+                        <button class="mc-mode-tab"         data-mgr-filter="custom"  onclick="setMgrFilter('custom',this)">✏️ Custom</button>
+                    </div>
+                </div>
+                <div id="mgr-items-list"></div>
+            </div>
+
+            <!-- hidden compat span so older JS refs don't break -->
+            <span id="custom-items-count" style="display:none;"></span>
+        </section>
+
+    </div>
+
+    <div id="toast"></div>
+
+<!-- Central menu registry shared with the Order Terminal -->
+<script src="menu-data.js"></script>
+
+<script>
+    /* ================================================================
+       FILE-BASED SETTINGS
+       settings.json is the single source of truth.
+       • GET  settings.json  — loaded on page open by loadSettingsFromFile()
+       • POST /save-settings — called by every save function via saveSettingsToFile()
+       The Python server (server.py) handles both endpoints.
+    ================================================================ */
+
+    // In-memory settings object populated from settings.json
+    let SETTINGS = {
+        storeClosed: false,
+        announcement: {
+            enabled: true,
+            type: "offer",
+            icon: "🎉",
+            text: "Announcement: <strong>Introducing FUTURE ORDER ! You can plan your order item for the next 14 days and Stay confident !!!</strong> !",
+            blink: true
+        },
+        whatsapp: "917845387741",
+        upi: "prabhunandhu-2@oksbi",
+        deliveryCharge: 0,
+        coupons: {
+            "AMRUTH10": { type: "percent", value: 10, label: "10% off",            enabled: true },
+            "FLAT50":   { type: "flat",    value: 50, label: "₹50 off",            enabled: true },
+            "WELCOME5": { type: "percent", value: 5,  label: "5% welcome discount", enabled: true }
+        },
+        itemVisibility: {},
+        daySchedule:    {},
+        customItems:     [],
+        deletedItems:    [],
+        favouriteItems:  [],
+        priceOverrides:  {}
+    };
+
+    function toast(msg, isError) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = isError ? "show error" : "show";
+        setTimeout(() => { t.className = t.className.replace("show", ""); }, 2600);
+        if (!isError) document.getElementById("last-saved").textContent = new Date().toLocaleTimeString();
+    }
+
+    // Fetch settings.json and update the in-memory SETTINGS object.
+    async function loadSettingsFromFile() {
+        try {
+            const res = await fetch('settings.json?_t=' + Date.now());
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            Object.assign(SETTINGS, data);
+        } catch (e) {
+            toast('⚠️ Could not load settings.json — using defaults. ' +
+                (isGitHubPages() ? 'Check settings.json exists in the repo.' : 'Start server.py first.'), true);
+            console.warn('[cp] loadSettingsFromFile:', e.message);
+        }
+        refreshStoreStatus();
+        loadAnnouncement();
+        loadPayments();
+        loadCoupons();
+        loadCustomItems();   // must run before loadMenuControl so customItemsState is populated
+        loadMenuControl();
+    }
+
+    // POST the current SETTINGS object to /save-settings → server.py writes settings.json.
+    // On GitHub Pages, commits the file directly via the GitHub Contents API instead.
+    async function saveSettingsToFile() {
+        if (isGitHubPages()) return saveToGitHub();
+        try {
+            const res = await fetch('/save-settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(SETTINGS, null, 2)
+            });
+            if (!res.ok) {
+                const msg = await res.text().catch(() => res.status);
+                throw new Error(msg);
+            }
+            return true;
+        } catch (e) {
+            toast('❌ Save failed — is server.py running? ' + e.message, true);
+            console.error('[cp] saveSettingsToFile:', e);
+            return false;
+        }
+    }
+
+    /* ================================================================
+       GITHUB PAGES SAVE
+       When hosted on *.github.io the Control Panel commits settings.json
+       directly to the repo via the GitHub Contents API.
+       The PAT is stored in localStorage on the admin's device only and
+       is sent exclusively to api.github.com — never anywhere else.
+    ================================================================ */
+
+    function isGitHubPages() {
+        return window.location.hostname.endsWith('.github.io');
+    }
+
+    // Auto-detect "username/repo" from the GitHub Pages URL.
+    // e.g. https://amruthadharanam.github.io/pos/ → "amruthadharanam/pos"
+    function detectGitHubRepo() {
+        const user = window.location.hostname.split('.')[0];
+        const segs  = window.location.pathname.split('/').filter(Boolean);
+        const repo  = segs.length > 0 ? segs[0] : `${user}.github.io`;
+        return `${user}/${repo}`;
+    }
+
+    const GH_TOKEN_KEY = 'ad_cp_gh_token';
+    const GH_BRANCH    = 'main';
+    const GH_FILE_PATH = 'settings.json';
+
+    async function saveToGitHub() {
+        const token = localStorage.getItem(GH_TOKEN_KEY);
+        if (!token) {
+            document.getElementById('gh-token-card').style.display = '';
+            document.getElementById('gh-token-input').focus();
+            toast('⚠️ Enter your GitHub token to enable saving', true);
+            return false;
+        }
+        const repo    = detectGitHubRepo();
+        const apiUrl  = `https://api.github.com/repos/${repo}/contents/${GH_FILE_PATH}`;
+        const content = JSON.stringify(SETTINGS, null, 2);
+        // btoa with full Unicode support
+        const b64 = btoa(unescape(encodeURIComponent(content)));
+        const headers = {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+        };
+        try {
+            // Step 1 — get the current SHA (needed to update an existing file)
+            const getRes = await fetch(`${apiUrl}?ref=${GH_BRANCH}&_t=${Date.now()}`, { headers });
+            if (getRes.status === 401) {
+                localStorage.removeItem(GH_TOKEN_KEY);
+                updateGitHubTokenUI();
+                throw new Error('Token invalid or expired — please re-enter it');
+            }
+            let sha = null;
+            if (getRes.ok) {
+                const fileData = await getRes.json();
+                sha = fileData.sha;
+            } else if (getRes.status !== 404) {
+                throw new Error(`GitHub API ${getRes.status}`);
+            }
+            // Step 2 — commit the updated file
+            const body = { message: `Control Panel update ${new Date().toISOString().slice(0,16).replace('T',' ')}`, content: b64, branch: GH_BRANCH };
+            if (sha) body.sha = sha;
+            const putRes = await fetch(apiUrl, { method: 'PUT', headers, body: JSON.stringify(body) });
+            if (!putRes.ok) {
+                const err = await putRes.json().catch(() => ({ message: putRes.status }));
+                throw new Error(err.message || putRes.status);
+            }
+            toast('✅ Saved to GitHub — changes live in ~1 minute');
+            return true;
+        } catch (e) {
+            toast('❌ GitHub save failed: ' + e.message, true);
+            return false;
+        }
+    }
+
+    function saveGitHubToken() {
+        const val = document.getElementById('gh-token-input').value.trim();
+        if (!val) { toast('Please enter a token', true); return; }
+        localStorage.setItem(GH_TOKEN_KEY, val);
+        document.getElementById('gh-token-input').value = '';
+        updateGitHubTokenUI();
+        toast('Token saved on this device');
+    }
+    function clearGitHubToken() {
+        localStorage.removeItem(GH_TOKEN_KEY);
+        updateGitHubTokenUI();
+        toast('Token cleared', true);
+    }
+    function updateGitHubTokenUI() {
+        const card   = document.getElementById('gh-token-card');
+        const status = card.querySelector('.gh-status-text');
+        const has    = !!localStorage.getItem(GH_TOKEN_KEY);
+        status.textContent = has ? '🔑 Token saved on this device — saves commit to GitHub' : '⚠️ No token set — saves will fail';
+        status.style.color = has ? 'var(--primary)' : 'var(--danger)';
+        document.getElementById('gh-clear-btn').style.display = has ? '' : 'none';
+    }
+    function initGitHubUI() {
+        const card = document.getElementById('gh-token-card');
+        if (!isGitHubPages()) { card.style.display = 'none'; return; }
+        updateGitHubTokenUI();
+        // Update scope pill for GitHub Pages context
+        document.getElementById('scope-pill').innerHTML =
+            '🐙 Hosted on <strong>GitHub Pages</strong>. Each save commits <code>settings.json</code> to your repo — customers see the update within ~1 minute. Configure your GitHub token below.';
+    }
+
+    /* ---------------- STORE STATUS ---------------- */
+    function refreshStoreStatus() {
+        const closed = !!SETTINGS.storeClosed;
+        document.getElementById("toggle-store-open").checked = !closed;
+        document.getElementById("status-dot").className = "status-dot" + (closed ? " closed" : "");
+        document.getElementById("status-text").textContent = closed ? "Store is CLOSED for ordering" : "Store is OPEN for ordering";
+        document.getElementById("store-toggle-label").textContent = closed ? "Store is closed for ordering" : "Store is open for ordering";
+    }
+    document.getElementById("toggle-store-open").addEventListener("change", async (e) => {
+        SETTINGS.storeClosed = !e.target.checked;
+        refreshStoreStatus();
+        const ok = await saveSettingsToFile();
+        if (ok) toast(e.target.checked ? "Store reopened" : "Store marked closed");
+    });
+
+    /* ---------------- ANNOUNCEMENT ---------------- */
+    function loadAnnouncement() {
+        const ann = SETTINGS.announcement || {};
+        document.getElementById("ann-enabled").checked = !!ann.enabled;
+        document.getElementById("ann-type").value = ann.type || "info";
+        document.getElementById("ann-icon").value = ann.icon || "";
+        document.getElementById("ann-blink").checked = !!ann.blink;
+        document.getElementById("ann-text").value = ann.text || "";
+        document.getElementById("announcement-override-flag").innerHTML = "";
+    }
+    async function saveAnnouncement() {
+        SETTINGS.announcement = {
+            enabled: document.getElementById("ann-enabled").checked,
+            type:    document.getElementById("ann-type").value,
+            icon:    document.getElementById("ann-icon").value.trim() || "📣",
+            blink:   document.getElementById("ann-blink").checked,
+            text:    document.getElementById("ann-text").value.trim()
+        };
+        const ok = await saveSettingsToFile();
+        if (ok) { loadAnnouncement(); toast("Banner saved"); }
+    }
+    async function resetAnnouncement() {
+        SETTINGS.announcement = {
+            enabled: true, type: "offer", icon: "🎉",
+            text: "Announcement: <strong>Introducing FUTURE ORDER !</strong>",
+            blink: true
+        };
+        const ok = await saveSettingsToFile();
+        if (ok) { loadAnnouncement(); toast("Banner reset to defaults"); }
+    }
+
+    /* ---------------- WHATSAPP / UPI / DELIVERY ---------------- */
+    function loadPayments() {
+        document.getElementById("wa-number").value = SETTINGS.whatsapp || "";
+        document.getElementById("upi-vpa").value   = SETTINGS.upi      || "";
+        document.getElementById("delivery-charge").value = SETTINGS.deliveryCharge ?? 0;
+        document.getElementById("payments-override-flag").innerHTML = "";
+    }
+    async function savePayments() {
+        SETTINGS.whatsapp       = document.getElementById("wa-number").value.trim();
+        SETTINGS.upi            = document.getElementById("upi-vpa").value.trim();
+        SETTINGS.deliveryCharge = parseFloat(document.getElementById("delivery-charge").value) || 0;
+        const ok = await saveSettingsToFile();
+        if (ok) { loadPayments(); toast("Payment settings saved"); }
+    }
+    async function resetPayments() {
+        SETTINGS.whatsapp       = "917845387741";
+        SETTINGS.upi            = "prabhunandhu-2@oksbi";
+        SETTINGS.deliveryCharge = 0;
+        const ok = await saveSettingsToFile();
+        if (ok) { loadPayments(); toast("Payment settings reset"); }
+    }
+
+    /* ---------------- COUPONS ---------------- */
+    let couponState = {}; // code -> {type, value, label, enabled}
+
+    function loadCoupons() {
+        couponState = {};
+        const saved = SETTINGS.coupons || {};
+        Object.entries(saved).forEach(([code, c]) => {
+            couponState[code] = Object.assign({ enabled: true }, c);
+        });
+        document.getElementById("coupons-override-flag").innerHTML = "";
+        renderCoupons();
+    }
+
+    function renderCoupons() {
+        const list = document.getElementById("coupon-list");
+        list.innerHTML = "";
+        Object.entries(couponState).forEach(([code, c]) => {
+            const row = document.createElement("div");
+            row.className = "coupon-row";
+            row.dataset.code = code;
+            row.innerHTML = `
+                <input type="text" class="c-code" value="${code}" placeholder="CODE">
+                <select class="c-type">
+                    <option value="percent" ${c.type === "percent" ? "selected" : ""}>% percent</option>
+                    <option value="flat" ${c.type === "flat" ? "selected" : ""}>₹ flat</option>
+                </select>
+                <input type="number" class="c-value" value="${c.value}" min="0">
+                <input type="text" class="c-label" value="${c.label || ''}" placeholder="Label shown to customer">
+                <label class="switch"><input type="checkbox" class="c-enabled" ${c.enabled ? "checked" : ""}><span class="slider"></span></label>
+                <button class="icon-btn" title="Remove" onclick="removeCouponRow(this)">🗑️</button>
+            `;
+            list.appendChild(row);
+        });
+    }
+
+    function addCouponRow() {
+        const code = "NEWCODE" + (Object.keys(couponState).length + 1);
+        couponState[code] = { type: "percent", value: 10, label: "", enabled: true };
+        renderCoupons();
+    }
+    function removeCouponRow(btn) {
+        const row = btn.closest(".coupon-row");
+        delete couponState[row.dataset.code];
+        renderCoupons();
+    }
+
+    function collectCouponsFromDOM() {
+        const result = {};
+        document.querySelectorAll(".coupon-row:not(.header-row)").forEach(row => {
+            const code = row.querySelector(".c-code").value.trim().toUpperCase();
+            if (!code) return;
+            result[code] = {
+                type:    row.querySelector(".c-type").value,
+                value:   parseFloat(row.querySelector(".c-value").value) || 0,
+                label:   row.querySelector(".c-label").value.trim(),
+                enabled: row.querySelector(".c-enabled").checked
+            };
+        });
+        return result;
+    }
+
+    async function saveCoupons() {
+        SETTINGS.coupons = collectCouponsFromDOM();
+        const ok = await saveSettingsToFile();
+        if (ok) { loadCoupons(); toast("Coupons saved"); }
+    }
+    async function resetCoupons() {
+        SETTINGS.coupons = {
+            "AMRUTH10": { type: "percent", value: 10, label: "10% off",            enabled: true },
+            "FLAT50":   { type: "flat",    value: 50, label: "₹50 off",            enabled: true },
+            "WELCOME5": { type: "percent", value: 5,  label: "5% welcome discount", enabled: true }
+        };
+        const ok = await saveSettingsToFile();
+        if (ok) { loadCoupons(); toast("Coupons reset to defaults"); }
+    }
+
+    /* ---------------- MENU CONTROL (visibility + day schedule) ---------------- */
+    const DAY_NAMES = ["Su","Mo","Tu","We","Th","Fr","Sa"];
+    const DAY_FULL  = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    let menuModeFilter   = "all";
+    let itemVisState     = {};
+    let dayScheduleState = {};
+
+    function loadMenuControl() {
+        itemVisState     = Object.assign({}, SETTINGS.itemVisibility || {});
+        dayScheduleState = Object.assign({}, SETTINGS.daySchedule    || {});
+        _updateMenuOverrideFlag();
+        renderMenuControl();
+    }
+
+    function formatPriceLabel(item) {
+        if (item.oldPrice && Number(item.oldPrice) > Number(item.price)) {
+            return `
+                <span class="mc-item-price">
+                    <span class="mc-old-price">₹${item.oldPrice}</span>
+                    <span class="mc-new-price">₹${item.price}</span>
+                </span>
+            `;
+        }
+        return `<span class="mc-item-price">₹${item.price}</span>`;
+    }
+
+    function _updateMenuOverrideFlag() {
+        const hidden   = Object.values(itemVisState).filter(v => v === false).length;
+        const dayRestr = Object.keys(dayScheduleState).filter(k => (dayScheduleState[k]||[]).length > 0).length;
+        document.getElementById("menu-override-flag").innerHTML =
+            (hidden || dayRestr)
+                ? `<span class="override-flag">${[hidden ? hidden+" hidden" : "", dayRestr ? dayRestr+" day-restricted" : ""].filter(Boolean).join(" · ")}</span>`
+                : "";
+    }
+
+    function setMenuModeFilter(val, btn) {
+        menuModeFilter = val;
+        document.querySelectorAll(".mc-mode-tab").forEach(b => b.classList.toggle("active", b === btn));
+        renderMenuControl();
+    }
+
+    function renderMenuControl() {
+        const query = (document.getElementById("menu-search")?.value || "").trim().toLowerCase();
+        const container = document.getElementById("menu-control-list");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const customForControl = (customItemsState || []).map(function(ci) {
+            return Object.assign({}, ci, { modes: ci.modes || ["Instant","Future"] });
+        });
+        const allItems = getAllMenuItems().map(function(item) {
+            return Object.assign({}, item, priceOverrideState[item.id] || {});
+        }).concat(customForControl);
+        const filtered = allItems.filter(item => {
+            if ((deletedItemsState || new Set()).has(item.id)) return false;
+            if (query && !item.name.toLowerCase().includes(query) && !item.category.toLowerCase().includes(query)) return false;
+            if (menuModeFilter === "Instant" && !item.modes.includes("Instant")) return false;
+            if (menuModeFilter === "Future"  && !item.modes.includes("Future"))  return false;
+            return true;
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = `<p class="card-note">No items match the current filter.</p>`;
+            return;
+        }
+
+        const groups = new Map();
+        filtered.forEach(item => {
+            if (!groups.has(item.title)) groups.set(item.title, []);
+            groups.get(item.title).push(item);
+        });
+
+        groups.forEach((items, title) => {
+            const group = document.createElement("div");
+            group.className = "mc-cat-group";
+
+            const hiddenCount = () => items.filter(it => {
+                if (Object.prototype.hasOwnProperty.call(itemVisState, it.id)) return !itemVisState[it.id];
+                return it.active === false;
+            }).length;
+
+            const headEl = document.createElement("div");
+            headEl.className = "mc-cat-head";
+            const updateHead = () => {
+                const h = hiddenCount();
+                headEl.innerHTML = `${title}${h ? ` <span class="override-flag">${h} hidden</span>` : ""}`;
+            };
+            updateHead();
+            group.appendChild(headEl);
+
+            items.forEach(item => {
+                const isVisible = Object.prototype.hasOwnProperty.call(itemVisState, item.id)
+                    ? itemVisState[item.id]
+                    : (item.active !== false);
+                const days = dayScheduleState[item.id] || [];
+
+                const modeCls  = item.modes.length > 1 ? "badge-both" : (item.modes[0] === "Instant" ? "badge-instant" : "badge-future");
+                const modeText = item.modes.length > 1 ? "Both menus" : (item.modes[0] === "Instant" ? "⚡ Today's" : "📅 Future");
+                const defaultOffNote = item.active === false && !Object.prototype.hasOwnProperty.call(itemVisState, item.id)
+                    ? ` <span style="font-size:0.65rem;color:var(--text-muted)">(off by default)</span>` : "";
+
+                const row = document.createElement("div");
+                row.className = `mc-item-row${isVisible ? "" : " mc-hidden"}`;
+                row.dataset.id = item.id;
+
+                const dayChks = DAY_NAMES.map((name, i) =>
+                    `<label class="mc-day-lbl${days.includes(i) ? " checked" : ""}" data-day="${i}" data-id="${item.id}" title="${DAY_FULL[i]}">${name}</label>`
+                ).join("");
+
+                const daysHint = days.length === 0 ? "Every day" : days.map(d => DAY_NAMES[d]).join("·");
+
+                row.innerHTML = `
+                    <div class="mc-item-meta">
+                        <span class="mc-item-name">${item.name}${defaultOffNote}</span>
+                        ${formatPriceLabel(item)}
+                        <span class="mc-mode-badge ${modeCls}">${modeText}</span>
+                        <span class="mc-off-badge">Off</span>
+                    </div>
+                    <div class="mc-item-controls">
+                        <label class="switch mc-vis-toggle" title="${isVisible ? "Hide from menu" : "Show in menu"}">
+                            <input type="checkbox" class="mc-vis-chk" ${isVisible ? "checked" : ""}>
+                            <span class="slider"></span>
+                        </label>
+                        <div class="mc-days">${dayChks}</div>
+                        <span class="mc-days-hint" data-id="${item.id}">${daysHint}</span>
+                    </div>
+                `;
+
+                row.querySelector(".mc-vis-chk").addEventListener("change", e => {
+                    itemVisState[item.id] = e.target.checked;
+                    row.classList.toggle("mc-hidden", !e.target.checked);
+                    updateHead();
+                    _updateMenuOverrideFlag();
+                });
+
+                row.querySelectorAll(".mc-day-lbl").forEach(lbl => {
+                    lbl.addEventListener("click", () => {
+                        lbl.classList.toggle("checked");
+                        const id = lbl.dataset.id;
+                        const selDays = [...row.querySelectorAll(".mc-day-lbl.checked")].map(l => parseInt(l.dataset.day));
+                        dayScheduleState[id] = selDays;
+                        row.querySelector(`.mc-days-hint[data-id="${id}"]`).textContent =
+                            selDays.length === 0 ? "Every day" : selDays.map(d => DAY_NAMES[d]).join("·");
+                        _updateMenuOverrideFlag();
+                    });
+                });
+
+                group.appendChild(row);
+            });
+            container.appendChild(group);
+        });
+    }
+
+    async function saveMenuControl() {
+        SETTINGS.itemVisibility = Object.assign({}, itemVisState);
+        SETTINGS.daySchedule    = Object.assign({}, dayScheduleState);
+        const ok = await saveSettingsToFile();
+        if (ok) { _updateMenuOverrideFlag(); toast("Menu settings saved"); }
+    }
+
+    async function resetMenuControl() {
+        itemVisState     = {};
+        dayScheduleState = {};
+        SETTINGS.itemVisibility = {};
+        SETTINGS.daySchedule    = {};
+        const ok = await saveSettingsToFile();
+        if (ok) {
+            renderMenuControl();
+            document.getElementById("menu-override-flag").innerHTML = "";
+            toast("Menu reset — all items use their default visibility");
+        }
+    }
+
+    /* ================================================================
+       MENU MANAGER — add items, delete items, mark favourites
+    ================================================================ */
+    let customItemsState     = [];        // custom items from settings.json
+    let deletedItemsState    = new Set(); // IDs of items hidden from terminal
+    let favouriteItemsState  = new Set(); // IDs of items shown as Staff Pick
+    let priceOverrideState   = {};        // override price/oldPrice for existing items
+    let mgrFilter            = "all";
+
+    function loadCustomItems() {
+        customItemsState     = Array.isArray(SETTINGS.customItems)    ? [...SETTINGS.customItems]    : [];
+        deletedItemsState    = new Set(SETTINGS.deletedItems   || []);
+        favouriteItemsState  = new Set(SETTINGS.favouriteItems || []);
+        priceOverrideState   = Object.assign({}, SETTINGS.priceOverrides || {});
+        buildCatSelectOptions();
+        updateMgrCounts();
+    }
+
+    function updateMgrCounts() {
+        const badge = document.getElementById("mgr-counts");
+        if (!badge) return;
+        const parts = [];
+        if (customItemsState.length)   parts.push(`${customItemsState.length} custom`);
+        if (deletedItemsState.size)    parts.push(`${deletedItemsState.size} deleted`);
+        if (favouriteItemsState.size)  parts.push(`${favouriteItemsState.size} favourite`);
+        badge.innerHTML = parts.length ? `<span class="override-flag">${parts.join(" · ")}</span>` : "";
+    }
+
+    function showMgrTab(tab, btn) {
+        document.getElementById("mgr-tab-add").style.display    = tab === "add"    ? "" : "none";
+        document.getElementById("mgr-tab-manage").style.display = tab === "manage" ? "" : "none";
+        document.querySelectorAll("[data-mgr-tab]").forEach(b => b.classList.toggle("active", b.dataset.mgrTab === tab));
+        if (tab === "manage") renderMgrList();
+        if (tab === "add")    buildCatSelectOptions();
+    }
+
+    function toggleCatMode() {
+        const isNew = document.querySelector('input[name="cat-mode"]:checked').value === "new";
+        document.getElementById("cat-existing-block").style.display = isNew ? "none" : "";
+        document.getElementById("cat-new-block").style.display      = isNew ? ""     : "none";
+    }
+
+    function buildCatSelectOptions() {
+        const sel = document.getElementById("ni-cat-select");
+        if (!sel) return;
+        const seen = new Map(); // category → title
+        getAllMenuItems().forEach(function(item) {
+            if (!seen.has(item.category)) seen.set(item.category, item.title);
+        });
+        customItemsState.forEach(function(item) {
+            if (!seen.has(item.category)) seen.set(item.category, item.title);
+        });
+        sel.innerHTML = [...seen.entries()].map(function([cat, title]) {
+            const safe = title.replace(/"/g, "&quot;");
+            return `<option value="${cat}" data-title="${safe}">${title}</option>`;
+        }).join("");
+    }
+
+    function setMgrFilter(f, btn) {
+        mgrFilter = f;
+        document.querySelectorAll("[data-mgr-filter]").forEach(b => b.classList.toggle("active", b.dataset.mgrFilter === f));
+        renderMgrList();
+    }
+
+    function renderMgrList() {
+        const query     = (document.getElementById("mgr-search")?.value || "").trim().toLowerCase();
+        const container = document.getElementById("mgr-items-list");
+        if (!container) return;
+
+        const staticItems  = getAllMenuItems().map(function(item) {
+            return Object.assign({}, item, priceOverrideState[item.id] || {});
+        });
+        const customForMgr = customItemsState.map(function(ci) {
+            return Object.assign({}, ci, { isCustom: true, modes: ci.modes || ["Instant","Future"] });
+        });
+        let allItems = staticItems.concat(customForMgr);
+
+        // Apply tab filter
+        if (mgrFilter === "fav")     allItems = allItems.filter(it => favouriteItemsState.has(it.id));
+        if (mgrFilter === "deleted") allItems = allItems.filter(it => deletedItemsState.has(it.id));
+        if (mgrFilter === "custom")  allItems = allItems.filter(it => it.isCustom);
+        if (query) allItems = allItems.filter(it =>
+            it.name.toLowerCase().includes(query) || it.category.toLowerCase().includes(query)
+        );
+
+        if (allItems.length === 0) {
+            container.innerHTML = `<p class="card-note" style="margin:0;color:var(--text-muted);">No items match.</p>`;
+            return;
+        }
+
+        // Group by section title
+        const groups = new Map();
+        allItems.forEach(item => {
+            if (!groups.has(item.title)) groups.set(item.title, []);
+            groups.get(item.title).push(item);
+        });
+
+        container.innerHTML = "";
+        groups.forEach(function(items, title) {
+            const grpDiv  = document.createElement("div");
+            grpDiv.className = "mc-cat-group";
+
+            const headDiv = document.createElement("div");
+            headDiv.className = "mc-cat-head";
+            headDiv.textContent = title;
+            grpDiv.appendChild(headDiv);
+
+            items.forEach(function(item) {
+                const isDel = deletedItemsState.has(item.id);
+                const isFav = favouriteItemsState.has(item.id);
+                const modes = item.modes || [];
+                const modeCls  = modes.length > 1 ? "badge-both" : (modes[0] === "Instant" ? "badge-instant" : "badge-future");
+                const modeText = modes.length > 1 ? "Both" : (modes[0] === "Instant" ? "⚡Today's" : "📅Future");
+                const basePrice = Number.isFinite(item.price) ? item.price : 0;
+                const baseOldPrice = Number.isFinite(item.oldPrice) ? item.oldPrice : "";
+
+                const row = document.createElement("div");
+                row.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:0.6rem;" +
+                    "padding:0.55rem 0.3rem;border-bottom:1px solid var(--border);" +
+                    (isDel ? "opacity:0.45;" : "");
+
+                row.innerHTML = `
+                    <div style="display:flex;align-items:baseline;gap:0.35rem;flex-wrap:wrap;min-width:0;flex:1;">
+                        <span style="font-size:0.85rem;${isDel ? "text-decoration:line-through;" : ""}">${item.name}</span>
+                        <label style="display:flex;flex-direction:column;gap:0.15rem;font-size:0.72rem;color:var(--text-muted);">
+                            <span>New</span>
+                            <input type="number" class="mgr-price-input" min="0" step="1" value="${basePrice}"
+                                style="width:92px;padding:0.35rem 0.45rem;border:1px solid var(--border);border-radius:8px;">
+                        </label>
+                        <label style="display:flex;flex-direction:column;gap:0.15rem;font-size:0.72rem;color:var(--text-muted);">
+                            <span>Old</span>
+                            <input type="number" class="mgr-oldprice-input" min="0" step="1" value="${baseOldPrice}"
+                                style="width:92px;padding:0.35rem 0.45rem;border:1px solid var(--border);border-radius:8px;">
+                        </label>
+                        <span class="mc-mode-badge ${modeCls}">${modeText}</span>
+                        ${item.isCustom ? `<span class="mc-mode-badge badge-both" style="background:rgba(90,40,150,0.12);color:#5a2882;">Custom</span>` : ""}
+                        ${isFav ? `<span style="font-size:0.7rem;color:var(--warning);font-weight:700;">★ Fav</span>` : ""}
+                    </div>
+                    <div style="display:flex;gap:0.35rem;flex-shrink:0;align-items:center;flex-wrap:wrap;">
+                        <button class="btn btn-sm btn-primary mgr-save-btn" type="button">Save</button>
+                        ${item.isCustom ? `<button class="btn btn-sm btn-ghost mgr-delete-custom-btn" type="button">🗑️ Remove</button>` : `<button class="btn btn-sm btn-ghost mgr-reset-btn" type="button">Reset</button>`}
+                        <button class="btn btn-sm btn-ghost" title="${isFav ? "Remove from favourites" : "Mark as staff favourite"}"
+                            onclick="toggleFavourite('${item.id}')"
+                            style="font-size:0.76rem;color:${isFav ? "var(--warning)" : "var(--text-muted)"};">
+                            ${isFav ? "★ Unfav" : "☆ Fav"}
+                        </button>
+                        ${item.isCustom
+                            ? ""
+                            : isDel
+                                ? `<button class="btn btn-sm btn-ghost" onclick="toggleDeleteItem('${item.id}')">↩ Restore</button>`
+                                : `<button class="btn btn-sm btn-ghost" onclick="toggleDeleteItem('${item.id}')"
+                                       style="color:var(--danger);border-color:rgba(198,40,40,0.3);">🗑️ Delete</button>`
+                        }
+                    </div>`;
+
+                const priceInput = row.querySelector('.mgr-price-input');
+                const oldPriceInput = row.querySelector('.mgr-oldprice-input');
+                const saveButton = row.querySelector('.mgr-save-btn');
+                const resetButton = row.querySelector('.mgr-reset-btn');
+                const deleteCustomButton = row.querySelector('.mgr-delete-custom-btn');
+
+                const savePriceChange = async () => {
+                    const newPrice = parseFloat(priceInput.value);
+                    const newOldPrice = parseFloat(oldPriceInput.value);
+                    if (isNaN(newPrice) || newPrice < 0) {
+                        toast('Please enter a valid new price', true);
+                        priceInput.value = basePrice;
+                        return;
+                    }
+                    if (!isNaN(newOldPrice) && newOldPrice <= newPrice) {
+                        toast('Old price must be higher than the new price or left blank', true);
+                        oldPriceInput.value = '';
+                        return;
+                    }
+
+                    if (item.isCustom) {
+                        const custom = customItemsState.find(ci => ci.id === item.id);
+                        if (!custom) return;
+                        custom.price = newPrice;
+                        if (!isNaN(newOldPrice) && newOldPrice > newPrice) custom.oldPrice = newOldPrice;
+                        else delete custom.oldPrice;
+                        SETTINGS.customItems = customItemsState;
+                    } else {
+                        SETTINGS.priceOverrides = SETTINGS.priceOverrides || {};
+                        const entry = Object.assign({}, SETTINGS.priceOverrides[item.id] || {});
+                        entry.price = newPrice;
+                        if (!isNaN(newOldPrice) && newOldPrice > newPrice) entry.oldPrice = newOldPrice;
+                        else delete entry.oldPrice;
+                        SETTINGS.priceOverrides[item.id] = entry;
+                    }
+
+                    const ok = await saveSettingsToFile();
+                    if (ok) {
+                        priceOverrideState = Object.assign({}, SETTINGS.priceOverrides || {});
+                        renderMgrList();
+                        renderMenuControl();
+                        toast('Price information saved');
+                    }
+                };
+
+                if (saveButton) saveButton.addEventListener('click', savePriceChange);
+                [priceInput, oldPriceInput].forEach(input => input && input.addEventListener('keydown', e => {
+                    if (e.key === 'Enter') savePriceChange();
+                }));
+
+                if (resetButton) {
+                    resetButton.addEventListener('click', async () => {
+                        if (item.isCustom) return;
+                        if (SETTINGS.priceOverrides && SETTINGS.priceOverrides[item.id]) {
+                            delete SETTINGS.priceOverrides[item.id];
+                        }
+                        priceOverrideState = Object.assign({}, SETTINGS.priceOverrides || {});
+                        const ok = await saveSettingsToFile();
+                        if (ok) {
+                            renderMgrList();
+                            renderMenuControl();
+                            toast('Price override reset for this item');
+                        }
+                    });
+                }
+
+                if (deleteCustomButton) {
+                    deleteCustomButton.addEventListener('click', () => deleteCustomItemById(item.id));
+                }
+
+                grpDiv.appendChild(row);
+            });
+            container.appendChild(grpDiv);
+        });
+    }
+
+    async function toggleFavourite(id) {
+        const wasFav = favouriteItemsState.has(id);
+        if (wasFav) favouriteItemsState.delete(id); else favouriteItemsState.add(id);
+        SETTINGS.favouriteItems = [...favouriteItemsState];
+        const ok = await saveSettingsToFile();
+        if (ok) {
+            updateMgrCounts();
+            renderMgrList();
+            toast(!wasFav ? "★ Marked as staff favourite" : "Removed from favourites");
+        } else {
+            if (wasFav) favouriteItemsState.add(id); else favouriteItemsState.delete(id);
+            SETTINGS.favouriteItems = [...favouriteItemsState];
+        }
+    }
+
+    async function toggleDeleteItem(id) {
+        const wasDel = deletedItemsState.has(id);
+        if (wasDel) deletedItemsState.delete(id); else deletedItemsState.add(id);
+        SETTINGS.deletedItems = [...deletedItemsState];
+        const ok = await saveSettingsToFile();
+        if (ok) {
+            updateMgrCounts();
+            renderMgrList();
+            renderMenuControl(); // refresh visibility panel too
+            toast(wasDel ? "↩ Item restored to menu" : "🗑️ Item deleted from menu");
+        } else {
+            if (wasDel) deletedItemsState.add(id); else deletedItemsState.delete(id);
+            SETTINGS.deletedItems = [...deletedItemsState];
+        }
+    }
+
+    async function addCustomItem() {
+        const name      = document.getElementById("ni-name").value.trim();
+        const price     = parseFloat(document.getElementById("ni-price").value);
+        const oldPrice  = parseFloat(document.getElementById("ni-old-price").value);
+        if (!name)                    { toast("Please enter an item name", true); return; }
+        if (isNaN(price) || price < 0){ toast("Please enter a valid price", true); return; }
+        if (!isNaN(oldPrice) && oldPrice <= price) {
+            toast("Old price must be higher than the current price, or leave it blank", true);
+            return;
+        }
+
+        const modesSel = document.getElementById("ni-modes").value;
+        const modes    = modesSel === "both" ? ["Instant","Future"] : [modesSel];
+        const popular  = document.getElementById("ni-popular").checked;
+        const isFavNew = document.getElementById("ni-fav").checked;
+
+        const isNew = document.querySelector('input[name="cat-mode"]:checked').value === "new";
+        let category, title;
+        if (isNew) {
+            category = document.getElementById("ni-new-cat").value.trim();
+            if (!category) { toast("Please enter a category name", true); return; }
+            title = document.getElementById("ni-new-title").value.trim() || `🍽️ ${category}`;
+        } else {
+            const selEl  = document.getElementById("ni-cat-select");
+            category = selEl.value;
+            const selOpt = selEl.options[selEl.selectedIndex];
+            title    = (selOpt && selOpt.dataset.title) || `🍽️ ${category}`;
+        }
+
+        const newItem = { id: "cx_" + Date.now(), name, price, category, title, modes, active: true };
+        if (!isNaN(oldPrice) && oldPrice > price) newItem.oldPrice = oldPrice;
+        if (popular) newItem.popular = true;
+
+        customItemsState.push(newItem);
+        if (isFavNew) favouriteItemsState.add(newItem.id);
+        SETTINGS.customItems    = customItemsState;
+        SETTINGS.favouriteItems = [...favouriteItemsState];
+
+        const ok = await saveSettingsToFile();
+        if (ok) {
+            updateMgrCounts();
+            buildCatSelectOptions(); // refresh in case new category was added
+            renderMenuControl();
+            document.getElementById("ni-name").value     = "";
+            document.getElementById("ni-price").value    = "";
+            document.getElementById("ni-old-price").value = "";
+            document.getElementById("ni-modes").value    = "both";
+            document.getElementById("ni-popular").checked = false;
+            document.getElementById("ni-fav").checked    = false;
+            if (isNew) {
+                document.getElementById("ni-new-cat").value   = "";
+                document.getElementById("ni-new-title").value = "";
+            }
+            toast(`"${name}" added to "${title}"`);
+        } else {
+            customItemsState.pop();
+            if (isFavNew) favouriteItemsState.delete(newItem.id);
+            SETTINGS.customItems    = customItemsState;
+            SETTINGS.favouriteItems = [...favouriteItemsState];
+        }
+    }
+
+    async function deleteCustomItemById(id) {
+        const idx  = customItemsState.findIndex(it => it.id === id);
+        if (idx === -1) return;
+        const item = customItemsState.splice(idx, 1)[0];
+        favouriteItemsState.delete(id);
+        deletedItemsState.delete(id);
+        SETTINGS.customItems    = customItemsState;
+        SETTINGS.favouriteItems = [...favouriteItemsState];
+        SETTINGS.deletedItems   = [...deletedItemsState];
+        const ok = await saveSettingsToFile();
+        if (ok) {
+            updateMgrCounts();
+            renderMgrList();
+            renderMenuControl();
+            toast(`"${item.name}" removed`);
+        } else {
+            customItemsState.splice(idx, 0, item);
+            SETTINGS.customItems = customItemsState;
+        }
+    }
+
+    /* ---------------- INIT ---------------- */
+    initGitHubUI();
+    loadSettingsFromFile();
+
+
+</script>
+</body>
+</html>

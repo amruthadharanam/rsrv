@@ -1,0 +1,71 @@
+{
+  "storeClosed": false,
+  "announcement": {
+    "enabled": true,
+    "type": "offer",
+    "icon": "ð",
+    "blink": true,
+    "text": "Announcement: <strong>Introducing FUTURE ORDER ! You can plan your order item for the next 14 days and Stay confident !!!</strong> !"
+  },
+  "whatsapp": "917845387741",
+  "upi": "prabhunandhu-2@oksbi",
+  "deliveryCharge": 0,
+  "coupons": {
+    "AMRUTH10": {
+      "type": "percent",
+      "value": 10,
+      "label": "10% off",
+      "enabled": true
+    },
+    "FLAT50": {
+      "type": "flat",
+      "value": 50,
+      "label": "₹50 off",
+      "enabled": true
+    },
+    "WELCOME5": {
+      "type": "percent",
+      "value": 5,
+      "label": "5% welcome discount",
+      "enabled": true
+    }
+  },
+  "itemVisibility": {
+    "cx_1784358160182": false,
+    "b4": true,
+    "i_co1": true,
+    "i_co4": true,
+    "i_co3": true,
+    "i_co5": true,
+    "i_co6": true,
+    "b3": true,
+    "b2": true,
+    "b1": true
+  },
+  "daySchedule": {
+    "b4": [
+      6
+    ]
+  },
+  "customItems": [],
+  "deletedItems": [],
+  "favouriteItems": [],
+  "priceOverrides": {
+    "b4": {
+      "price": 90,
+      "oldPrice": 125
+    },
+    "b1": {
+      "price": 80,
+      "oldPrice": 100
+    },
+    "b2": {
+      "price": 40,
+      "oldPrice": 50
+    },
+    "b3": {
+      "price": 45,
+      "oldPrice": 50
+    }
+  }
+}

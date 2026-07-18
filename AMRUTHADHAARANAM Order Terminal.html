@@ -1,0 +1,2434 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMRUTHADHAARANAM — Order Terminal</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* ============================================================
+           DESIGN SYSTEM
+           Palette: deep rosewood lacquer + hand-cast brass + warm ivory —
+           the material world of a carved wooden door with polished metal
+           fittings, rendered as a tactile, dimensional interface rather
+           than a flat "food app" gradient. Every raised surface below
+           (buttons, tabs, the medallion frame) is built from layered
+           shadows so it reads as cast or carved, not printed.
+        ============================================================ */
+        :root {
+            --primary: #6E2027;
+            --primary-deep: #3B0F13;
+            --secondary: #C9A227;
+            --secondary-bright: #F0D584;
+            --secondary-deep: #7A5A12;
+            --background: #F6EEDF;
+            --surface: #FFFCF5;
+            --accent: #A8462F;
+            --success: #2E7D32;
+            --danger: #C62828;
+            --warning: #8B5E10;
+            --text-main: #2B1B14;
+            --text-muted: #7C6A57;
+            --border: #E4D6B8;
+            --radius-sm: 6px;
+            --radius-md: 9px;
+            --radius-lg: 16px;
+            --shadow: 0 4px 14px rgba(59, 15, 19, 0.10);
+            --shadow-lift: 0 14px 34px rgba(59, 15, 19, 0.22);
+            --transition: all 0.18s ease-in-out;
+
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --font-btn: 'Manrope', sans-serif;
+            --font-mono: 'IBM Plex Mono', monospace;
+            --heading-color: var(--primary);
+
+            /* Cast-metal bevel recipe, reused on every "pressable" surface
+               so raised and pressed states share one consistent language. */
+            --emboss-raised:
+                0 1px 0 rgba(255,255,255,0.5) inset,
+                0 -2px 3px rgba(59,15,19,0.18) inset,
+                0 3px 8px rgba(59,15,19,0.16);
+            --emboss-pressed:
+                0 2px 4px rgba(59,15,19,0.28) inset,
+                0 -1px 0 rgba(255,255,255,0.25) inset;
+
+            /* Crystal layer — glass fill + a glowing gradient brass
+               wire traced around each panel's edge, like a faceted
+               gem set in a metal claw. Layered on TOP of the carved
+               surfaces above, not a replacement for them. */
+            --glass-fill: linear-gradient(155deg, rgba(255,255,255,0.60), rgba(255,255,255,0.30));
+            --glass-blur: blur(16px) saturate(150%);
+            --wire-gradient: linear-gradient(135deg, var(--secondary-bright), var(--secondary) 45%, var(--secondary-deep) 70%, var(--secondary-bright));
+            --wire-glow: 0 0 0 1px rgba(201,162,39,0.25), 0 0 22px rgba(201,162,39,0.20), 0 0 2px rgba(255,255,255,0.6);
+            --spring: cubic-bezier(.34, 1.56, .64, 1);
+        }
+
+        [data-theme="dark"] {
+            --glass-fill: linear-gradient(155deg, rgba(255,255,255,0.07), rgba(255,255,255,0.015));
+            --wire-gradient: linear-gradient(135deg, var(--secondary-bright), var(--secondary) 45%, var(--secondary-deep) 70%, var(--secondary-bright));
+            --wire-glow: 0 0 0 1px rgba(232,199,102,0.28), 0 0 26px rgba(232,199,102,0.22), 0 0 2px rgba(255,255,255,0.15);
+        }
+
+        [data-theme="dark"] {
+            --primary: #B14B52;
+            --primary-deep: #6E2027;
+            --secondary: #E8C766;
+            --secondary-bright: #F5DFA0;
+            --secondary-deep: #A5811E;
+            --background: #150A0B;
+            --surface: #271416;
+            --accent: #D97A4E;
+            --text-main: #F3E9DA;
+            --text-muted: #B79E87;
+            --border: #4A2B27;
+            --shadow: 0 4px 14px rgba(0,0,0,0.35);
+            --shadow-lift: 0 16px 38px rgba(0,0,0,0.5);
+            --heading-color: var(--secondary);
+            --emboss-raised:
+                0 1px 0 rgba(255,255,255,0.06) inset,
+                0 -2px 4px rgba(0,0,0,0.4) inset,
+                0 3px 10px rgba(0,0,0,0.4);
+            --emboss-pressed:
+                0 2px 5px rgba(0,0,0,0.55) inset,
+                0 -1px 0 rgba(255,255,255,0.04) inset;
+        }
+        [data-theme="dark"] body {
+            background-image:
+                radial-gradient(circle at 12% 8%, rgba(232,199,102,0.05) 0, transparent 40%),
+                radial-gradient(circle at 88% 92%, rgba(232,199,102,0.05) 0, transparent 40%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23E8C766' stroke-width='0.6' opacity='0.14'%3E%3Cpath d='M60 4 L116 60 L60 116 L4 60 Z'/%3E%3Cpath d='M60 30 L90 60 L60 90 L30 60 Z'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='2.4' fill='%23E8C766' opacity='0.16'/%3E%3Ccircle cx='4' cy='60' r='1.6' fill='%23E8C766' opacity='0.12'/%3E%3Ccircle cx='116' cy='60' r='1.6' fill='%23E8C766' opacity='0.12'/%3E%3Ccircle cx='60' cy='4' r='1.6' fill='%23E8C766' opacity='0.12'/%3E%3Ccircle cx='60' cy='116' r='1.6' fill='%23E8C766' opacity='0.12'/%3E%3C/svg%3E");
+            background-size: auto, auto, 120px 120px;
+        }
+
+        html { overflow-x: hidden; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-body);
+            background-color: var(--background);
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(110,32,39,0.045) 0, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(110,32,39,0.045) 0, transparent 40%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%236E2027' stroke-width='0.6' opacity='0.10'%3E%3Cpath d='M60 4 L116 60 L60 116 L4 60 Z'/%3E%3Cpath d='M60 30 L90 60 L60 90 L30 60 Z'/%3E%3C/g%3E%3Ccircle cx='60' cy='60' r='2.4' fill='%23C9A227' opacity='0.16'/%3E%3Ccircle cx='4' cy='60' r='1.6' fill='%23C9A227' opacity='0.12'/%3E%3Ccircle cx='116' cy='60' r='1.6' fill='%23C9A227' opacity='0.12'/%3E%3Ccircle cx='60' cy='4' r='1.6' fill='%23C9A227' opacity='0.12'/%3E%3Ccircle cx='60' cy='116' r='1.6' fill='%23C9A227' opacity='0.12'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: auto, auto, 120px 120px;
+            color: var(--text-main);
+            line-height: 1.5;
+            transition: var(--transition);
+        }
+        a { color: inherit; }
+        :focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
+
+        /* ============================================================
+           CRYSTAL LAYER
+           A shared "glass panel" treatment: frosted translucency over
+           the diamond-facet backdrop, a glowing brass wire traced
+           around the rounded edge (drawn with a masked gradient so it
+           follows border-radius exactly, not a straight-sided box),
+           and a soft diagonal light sweep for a faceted-glass glint.
+           Applied to structural panels only — buttons and inputs stay
+           solid so text and tap targets remain crisp and legible.
+        ============================================================ */
+        .crystal {
+            position: relative;
+            background-image: var(--glass-fill);
+            -webkit-backdrop-filter: var(--glass-blur);
+            backdrop-filter: var(--glass-blur);
+        }
+        .crystal::before {
+            content: '';
+            position: absolute; inset: 0; border-radius: inherit;
+            padding: 1.5px;
+            background: var(--wire-gradient);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .crystal::after {
+            content: '';
+            position: absolute; inset: 0; border-radius: inherit;
+            background: linear-gradient(115deg, rgba(255,255,255,0.35) 0%, transparent 22%, transparent 78%, rgba(255,255,255,0.12) 100%);
+            pointer-events: none; z-index: 1; mix-blend-mode: soft-light;
+        }
+        [data-theme="dark"] .crystal::after { mix-blend-mode: overlay; opacity: 0.7; }
+        .crystal > * { position: relative; z-index: 2; }
+        @media (max-width: 640px) {
+            .crystal { -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); }
+        }
+
+        /* ============================================================
+           LIVE STATUS BOARD — the signature element.
+           Reads like a hospitality front-desk / departure board:
+           instantly tells staff whether the kitchen can take orders,
+           without ever hard-blocking them from queuing one anyway.
+        ============================================================ */
+        .status-board {
+            max-width: 1600px;
+            margin: 0 auto 1rem;
+            padding: 0.6rem 1.5rem;
+            background: linear-gradient(90deg, var(--primary-deep), var(--primary));
+            color: #F5EEDD;
+            border-radius: var(--radius-md);
+            border-bottom: 2px solid var(--secondary-deep);
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            letter-spacing: 0.03em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.25rem;
+            box-shadow: var(--shadow), var(--wire-glow), 0 1px 0 rgba(255,255,255,0.08) inset;
+        }
+        .status-board .seg { display: flex; align-items: center; gap: 0.5rem; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 2px rgba(0,0,0,0.15) inset; }
+        .status-dot.open { background: #6FCF97; box-shadow: 0 0 0 0 rgba(111,207,151,0.6); animation: pulse-dot 2.2s infinite; }
+        .status-dot.closing { background: #F2C94C; animation: pulse-dot-amber 2.2s infinite; }
+        .status-dot.closed { background: #E57373; }
+        @keyframes pulse-dot {
+            0% { box-shadow: 0 0 0 0 rgba(111,207,151,0.55); }
+            70% { box-shadow: 0 0 0 7px rgba(111,207,151,0); }
+            100% { box-shadow: 0 0 0 0 rgba(111,207,151,0); }
+        }
+        @keyframes pulse-dot-amber {
+            0% { box-shadow: 0 0 0 0 rgba(242,201,76,0.6); }
+            70% { box-shadow: 0 0 0 7px rgba(242,201,76,0); }
+            100% { box-shadow: 0 0 0 0 rgba(242,201,76,0); }
+        }
+        .status-board.status-closing { background: linear-gradient(90deg, #6B4400, #8B5E10); }
+        .status-board.status-closed  { background: linear-gradient(90deg, #4A1414, #6E2027); }
+        .veg-mark { width: 12px; height: 12px; border: 1.5px solid #8FD19E; border-radius: 2px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .veg-mark::after { content: ''; width: 5px; height: 5px; background: #8FD19E; border-radius: 50%; }
+        .status-board .divider { opacity: 0.4; color: var(--secondary-bright); }
+
+        /* ============================================================
+           ANNOUNCEMENT BANNER
+        ============================================================ */
+        .announcement-bar {
+            max-width: 1600px;
+            margin: 0 auto 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1.1rem;
+            border-radius: var(--radius-md);
+            background: linear-gradient(90deg, var(--primary-deep), var(--primary));
+            border: 1px solid var(--primary-deep);
+            border-left: 4px solid var(--secondary);
+            box-shadow: var(--shadow);
+            font-size: 0.85rem;
+            color: #FFFFFF;
+        }
+        .announcement-bar.visible { display: flex; }
+        .announcement-bar .ab-icon { font-size: 1.15rem; flex-shrink: 0; line-height: 1; }
+        .announcement-bar .ab-text { flex: 1; line-height: 1.5; color: #FFFFFF; }
+        .announcement-bar .ab-text strong { color: #2B1B14; font-family: var(--font-btn); background: linear-gradient(180deg, var(--secondary-bright), var(--secondary)); padding: 1px 6px; border-radius: 4px; }
+        .announcement-bar .ab-close {
+            background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.75);
+            font-size: 1.1rem; line-height: 1; padding: 0.2rem 0.4rem; border-radius: 4px;
+            flex-shrink: 0; transition: var(--transition);
+        }
+        .announcement-bar .ab-close:hover { background: rgba(255,255,255,0.15); color: #FFFFFF; }
+
+        .announcement-bar.type-info    { border-left-color: var(--secondary); }
+        .announcement-bar.type-offer   { border-left-color: var(--secondary); }
+        .announcement-bar.type-urgent  { background: linear-gradient(90deg, #4A1414, #6E2027); border-left-color: #F2C94C; }
+        .announcement-bar.type-urgent .ab-text strong { color: #FFFFFF; background: rgba(255,255,255,0.18); }
+
+        .announcement-bar .ab-icon.blinking { animation: ab-blink 12s ease-in-out infinite; }
+        @keyframes ab-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.85); } }
+        @media (prefers-reduced-motion: reduce) {
+            .announcement-bar .ab-icon.blinking { animation: none; }
+        }
+
+        @media (max-width: 768px) {
+            .announcement-bar { font-size: 0.78rem; padding: 0.6rem 0.85rem; }
+        }
+
+        /* ============================================================
+           LAYOUT
+        ============================================================ */
+        .app-container {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            min-height: 100vh;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        .main-content { padding: 0 2rem 2rem; max-height: 100vh; overflow-y: auto; }
+        .sidebar {
+            background-color: var(--surface);
+            border-left: 1px solid var(--border);
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            box-shadow: var(--shadow);
+            overflow-y: auto;
+        }
+
+        /* Header reads as a brass-fitted plaque: warm gradient panel,
+           a fine brass rule underneath, and a raised medallion frame
+           around the logo — the page's one unmissable "cast metal"
+           moment, echoed later in the tabs and buttons. */
+        .pos-header {
+            display: grid;
+            grid-template-columns: 190px 1fr;
+            align-items: center;
+            background: linear-gradient(120deg, rgba(110,32,39,0.05) 0%, var(--surface) 55%, rgba(201,162,39,0.08) 100%);
+            padding: 1.1rem 1.75rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(110,32,39,0.09), 0 1px 3px rgba(0,0,0,0.04), var(--wire-glow);
+            border: 1px solid var(--border);
+            border-bottom: 3px solid var(--secondary);
+            gap: 1.25rem;
+        }
+        [data-theme="dark"] .pos-header {
+            background: linear-gradient(120deg, rgba(177,75,82,0.12) 0%, var(--surface) 55%, rgba(232,199,102,0.06) 100%);
+        }
+        .header-left { display: flex; align-items: center; justify-content: center; }
+        /* The logo is a wide arch-shaped banner (~1.84:1), not a square
+           mark — object-fit: contain guarantees the full arch, its side
+           flourishes, and the lettering are always shown intact, never
+           cropped, at whatever width the layout gives it. */
+        .brand-logo {
+            width: 100%; height: auto; max-height: 92px;
+            object-fit: contain; object-position: center;
+            display: block;
+            filter: drop-shadow(0 3px 8px rgba(59,15,19,0.25));
+        }
+        .brand-logo-fallback {
+            width: 100%; height: 64px; border-radius: var(--radius-md);
+            background: radial-gradient(circle at 35% 30%, var(--secondary-bright), var(--secondary) 55%, var(--secondary-deep) 100%);
+            color: var(--primary-deep);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--font-heading); font-weight: 700; font-size: 1.4rem;
+            box-shadow:
+                0 1px 0 rgba(255,255,255,0.6) inset,
+                0 -3px 5px rgba(0,0,0,0.25) inset,
+                0 3px 10px rgba(59,15,19,0.35);
+        }
+        .header-center { text-align: center; }
+        .header-center h1 {
+            font-family: var(--font-heading); color: var(--heading-color); font-size: 1.9rem;
+            letter-spacing: 1.5px; transition: color 0.3s ease;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+        }
+        [data-theme="dark"] .header-center h1 { text-shadow: 0 1px 6px rgba(232,199,102,0.25); }
+        .header-center p { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.3rem; letter-spacing: 0.03em; }
+
+        /* --- FILTERS & CONTROLS --- */
+        .controls-row {
+            display: flex; gap: 1rem; margin: 1.5rem 0 1.5rem;
+            align-items: center; flex-wrap: wrap;
+            position: sticky; top: 0; z-index: 5;
+            background: var(--background);
+            padding: 0.4rem 0;
+        }
+        .search-wrapper { flex: 1; position: relative; min-width: 250px; }
+        .search-input {
+            width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: var(--radius-md); border: 1px solid var(--border);
+            background: var(--surface); color: var(--text-main); font-size: 0.95rem;
+            box-shadow: 0 2px 5px rgba(59,15,19,0.06) inset;
+        }
+        .search-wrapper::before { content: "🔍"; position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); }
+        .search-shortcut-hint {
+            position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%);
+            font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted);
+            border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px;
+            pointer-events: none;
+        }
+        .category-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .pill {
+            padding: 0.5rem 1rem; border: 1px solid var(--border); background: var(--surface);
+            color: var(--text-main); cursor: pointer; border-radius: 20px;
+            font-family: var(--font-btn); font-size: 0.85rem; transition: var(--transition);
+            box-shadow: var(--emboss-raised);
+        }
+        .pill.active, .pill:hover { background: linear-gradient(180deg, var(--primary), var(--primary-deep)); color: white; border-color: var(--primary-deep); }
+        .pill:active { box-shadow: var(--emboss-pressed); transform: translateY(1px); }
+        .theme-toggle {
+            background: var(--surface); border: 1.5px solid var(--secondary-deep); cursor: pointer;
+            padding: 0.45rem 0.85rem; border-radius: var(--radius-md); font-family: var(--font-btn);
+            font-size: 0.8rem; font-weight: 600; color: var(--primary); display: flex;
+            align-items: center; gap: 0.4rem; white-space: nowrap; transition: var(--transition);
+            box-shadow: var(--emboss-raised);
+        }
+        .theme-toggle:hover { background: linear-gradient(180deg, var(--secondary-bright), var(--secondary)); color: var(--primary-deep); transform: translateY(-1px); }
+        .theme-toggle:active { box-shadow: var(--emboss-pressed); transform: translateY(1px); }
+        #theme-icon { font-size: 1rem; line-height: 1; }
+
+        /* ============================================================
+           ORDERING MODE TABS
+           Cast as a pair of brass plaques: the resting tab is raised
+           (embossed), the active tab reads as pressed-in and engraved.
+        ============================================================ */
+        .mode-tabs {
+            display: flex; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap;
+        }
+        .mode-tab {
+            flex: 1; min-width: 150px; padding: 0.75rem 1rem; border: 1.5px solid var(--secondary-deep);
+            background: linear-gradient(180deg, var(--surface), var(--background));
+            color: var(--text-main); border-radius: var(--radius-md);
+            font-family: var(--font-btn); font-weight: 700; font-size: 0.88rem; cursor: pointer;
+            transition: var(--transition); text-align: center;
+            box-shadow: var(--emboss-raised);
+        }
+        .mode-tab:hover { border-color: var(--primary); transform: translateY(-1px); }
+        .mode-tab.active {
+            background: linear-gradient(180deg, var(--primary-deep), var(--primary));
+            color: var(--secondary-bright); border-color: var(--primary-deep);
+            box-shadow: var(--emboss-pressed);
+            text-shadow: 0 1px 1px rgba(0,0,0,0.4);
+        }
+
+        /* Future Order's date/time card. */
+        .schedule-card {
+            display: none; border: 1px solid var(--border);
+            border-left: 4px solid var(--secondary); border-radius: var(--radius-lg);
+            padding: 1.1rem 1.25rem; margin-bottom: 1.5rem; box-shadow: var(--shadow), var(--wire-glow);
+        }
+        .schedule-card.visible { display: block; animation: toast-in 0.2s var(--spring); }
+        .schedule-card-title {
+            font-family: var(--font-heading); color: var(--heading-color); font-size: 1.1rem;
+            margin-bottom: 0.9rem;
+        }
+        .schedule-card-fields {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+        }
+        .schedule-card-hint {
+            font-size: 0.76rem; color: var(--text-muted); margin-top: 0.75rem; line-height: 1.5;
+        }
+        @media (max-width: 640px) {
+            .schedule-card-fields { grid-template-columns: 1fr; }
+            .mode-tab { min-width: 105px; font-size: 0.78rem; padding: 0.65rem 0.5rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .schedule-card.visible { animation: none; }
+        }
+
+        .cart-schedule-note {
+            display: none; font-size: 0.78rem; color: var(--primary);
+            background: rgba(110,32,39,0.06); border: 1px dashed var(--secondary-deep);
+            border-radius: var(--radius-md); padding: 0.5rem 0.7rem; margin-bottom: 0.6rem;
+        }
+        .cart-schedule-note.visible { display: block; }
+        [data-theme="dark"] .cart-schedule-note { background: rgba(232,199,102,0.08); color: var(--secondary-bright); }
+
+        /* --- MENU GRID ---
+           Each category card is a small glass panel in a glowing brass
+           wire frame, floating over the diamond-facet backdrop, and it
+           tilts in real 3D toward the cursor (see the tiltEffect script
+           near the end of the page) rather than a fixed hover angle. */
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; perspective: 1400px; }
+        .category-card {
+            border: 1px solid var(--border); border-left: 4px solid var(--secondary);
+            border-radius: var(--radius-lg); padding: 1.25rem;
+            box-shadow: var(--shadow), var(--wire-glow), 0 1px 0 rgba(255,255,255,0.5) inset;
+            transition: transform 0.35s var(--spring), box-shadow 0.35s ease;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .category-card:hover {
+            box-shadow: var(--shadow-lift), var(--wire-glow), 0 1px 0 rgba(255,255,255,0.5) inset;
+        }
+        @media (prefers-reduced-motion: reduce) { .category-card { transition: box-shadow 0.2s ease; } }
+        .category-title {
+            font-family: var(--font-heading); color: var(--heading-color); border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem; margin-bottom: 1rem; font-size: 1.15rem;
+        }
+        .menu-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px dashed var(--border); }
+        .menu-item:last-child { border-bottom: none; }
+        .item-info h4 { font-size: 0.95rem; font-weight: 500; }
+        .item-info .item-price { display: inline-flex; flex-direction: column; gap: 0.18rem; margin-top: 0.35rem; }
+        .item-info .item-price, .item-info .item-current-price { color: var(--accent); font-weight: 600; font-size: 0.9rem; }
+        .item-info .item-old-price { text-decoration: line-through; color: var(--text-muted); font-size: 0.78rem; }
+        .item-info .item-current-price { color: var(--accent); font-weight: 700; }
+        .badge-popular {
+            background: linear-gradient(180deg, var(--secondary-bright), var(--secondary-deep));
+            color: #3B0F13; font-size: 0.6rem; font-weight: 700;
+            padding: 1px 7px; border-radius: 8px; margin-left: 6px; letter-spacing: 0.02em;
+            vertical-align: middle; white-space: nowrap;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset, 0 1px 2px rgba(59,15,19,0.3);
+        }
+        .badge-favourite {
+            display: inline-flex; align-items: center; gap: 2px;
+            background: linear-gradient(135deg, #7a1fa2, #ab47bc);
+            color: #fff; font-size: 0.6rem; font-weight: 700;
+            padding: 1px 7px; border-radius: 8px; margin-left: 6px; letter-spacing: 0.02em;
+            vertical-align: middle; white-space: nowrap;
+            box-shadow: 0 0 0 1px rgba(171,71,188,0.35), 0 1px 3px rgba(122,31,162,0.4);
+        }
+        [data-theme="dark"] .badge-favourite {
+            background: linear-gradient(135deg, #9c27b0, #ce93d8);
+            color: #1a001f;
+        }
+        .badge-tomorrow {
+            display: inline-flex; align-items: center; gap: 3px;
+            font-size: 0.6rem; font-weight: 700; letter-spacing: 0.03em;
+            padding: 2px 8px; border-radius: 8px; margin-left: 6px;
+            vertical-align: middle; white-space: nowrap;
+            background: linear-gradient(135deg, #1a6b3a, #2d9e5a);
+            color: #e8f9ee;
+            box-shadow: 0 0 0 1px rgba(45,158,90,0.35), 0 1px 0 rgba(255,255,255,0.18) inset, 0 2px 6px rgba(26,107,58,0.35);
+            animation: tomorrow-pulse 3s ease-in-out infinite;
+        }
+        [data-theme="dark"] .badge-tomorrow {
+            background: linear-gradient(135deg, #1e8048, #27ae60);
+            color: #d4f5e2;
+            box-shadow: 0 0 0 1px rgba(39,174,96,0.4), 0 1px 0 rgba(255,255,255,0.1) inset, 0 2px 8px rgba(39,174,96,0.3);
+        }
+        @keyframes tomorrow-pulse {
+            0%, 100% { box-shadow: 0 0 0 1px rgba(45,158,90,0.35), 0 1px 0 rgba(255,255,255,0.18) inset, 0 2px 6px rgba(26,107,58,0.35); }
+            50%       { box-shadow: 0 0 0 3px rgba(45,158,90,0.18), 0 1px 0 rgba(255,255,255,0.18) inset, 0 4px 14px rgba(26,107,58,0.45); }
+        }
+        @media (prefers-reduced-motion: reduce) { .badge-tomorrow { animation: none; } }
+        .menu-item.tomorrow-special {
+            background: linear-gradient(90deg, rgba(45,158,90,0.06) 0%, transparent 100%);
+            border-left: 3px solid #2d9e5a;
+            padding-left: 0.6rem;
+            margin-left: -0.6rem;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+        }
+        [data-theme="dark"] .menu-item.tomorrow-special {
+            background: linear-gradient(90deg, rgba(39,174,96,0.1) 0%, transparent 100%);
+            border-left-color: #27ae60;
+        }
+
+        .qty-controls { display: flex; align-items: center; gap: 0.5rem; }
+        .qty-btn {
+            background: linear-gradient(180deg, var(--surface), var(--border)); border: 1px solid var(--border); width: 30px; height: 30px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1.05rem;
+            display: flex; align-items: center; justify-content: center; transition: var(--transition);
+            box-shadow: var(--emboss-raised); color: var(--text-main);
+        }
+        .qty-btn:hover { background: linear-gradient(180deg, var(--secondary-bright), var(--secondary)); border-color: var(--secondary-deep); }
+        .qty-btn:active { box-shadow: var(--emboss-pressed); transform: scale(0.94); }
+        .qty-input {
+            width: 38px; text-align: center; border: 1px solid var(--border);
+            border-radius: 4px; background: transparent; color: var(--text-main); font-family: var(--font-mono);
+            padding: 0.3rem 0;
+        }
+
+        .menu-item.in-cart {
+            background: rgba(110, 32, 39, 0.06); border-radius: var(--radius-md);
+            margin: 0 -0.5rem; padding-left: 0.5rem; padding-right: 0.5rem;
+            border-bottom-color: rgba(110, 32, 39, 0.18);
+        }
+        .menu-item.in-cart .item-info h4 { color: var(--primary); font-weight: 600; }
+        .menu-item.in-cart .qty-btn { background: linear-gradient(180deg, var(--primary), var(--primary-deep)); color: white; border-color: var(--primary-deep); }
+
+        .pill-badge {
+            display: inline-block; background: linear-gradient(180deg, var(--secondary-bright), var(--secondary)); color: #2B1B14; font-size: 0.68rem;
+            font-weight: 700; border-radius: 10px; padding: 1px 6px; margin-left: 4px;
+            vertical-align: middle; line-height: 1.5;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.5) inset;
+        }
+        .pill.active .pill-badge { background: rgba(255,255,255,0.3); color: white; box-shadow: none; }
+
+        .empty-results { text-align: center; padding: 3rem 1rem; color: var(--text-muted); grid-column: 1 / -1; }
+        .empty-results .empty-icon { font-size: 2.2rem; display: block; margin-bottom: 0.6rem; }
+
+        /* --- ORDER REF CHIP (sidebar summary) --- */
+        .order-ref-chip {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(110,32,39,0.05); border: 1px dashed var(--secondary-deep);
+            border-radius: var(--radius-md); padding: 0.42rem 0.75rem;
+            font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.75rem;
+        }
+        .order-ref-value { font-family: var(--font-mono); color: var(--primary); font-weight: 600; font-size: 0.8rem; }
+        [data-theme="dark"] .order-ref-chip { background: rgba(232,199,102,0.08); }
+
+        .cart-empty-state { text-align: center; padding: 1.25rem 0 0.5rem; color: var(--text-muted); font-size: 0.82rem; }
+        .cart-empty-state .empty-icon { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+
+        /* --- SIDEBAR: NUMBERED WORKFLOW STEPS --- */
+        .step-title {
+            display: flex; align-items: center; gap: 0.6rem; font-size: 0.92rem; text-transform: uppercase;
+            letter-spacing: 0.05em; color: var(--primary); font-family: var(--font-btn);
+            border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; margin-bottom: 0.85rem;
+        }
+        .step-num {
+            width: 22px; height: 22px; border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, var(--secondary-bright), var(--secondary) 60%, var(--secondary-deep) 100%);
+            color: var(--primary-deep);
+            font-family: var(--font-mono); font-size: 0.72rem; display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0;
+            box-shadow: 0 1px 0 rgba(255,255,255,0.6) inset, 0 -2px 3px rgba(0,0,0,0.2) inset;
+        }
+
+        .segmented { display: flex; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--emboss-raised); }
+        .segmented button {
+            flex: 1; padding: 0.6rem; border: none; background: var(--surface); color: var(--text-main);
+            font-family: var(--font-btn); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: var(--transition);
+        }
+        .segmented button:not(:last-child) { border-right: 1px solid var(--border); }
+        .segmented button.active { background: linear-gradient(180deg, var(--primary), var(--primary-deep)); color: #fff; }
+
+        .pickup-note {
+            font-size: 0.78rem; color: var(--text-muted); background: rgba(168, 70, 47, 0.08);
+            border: 1px dashed var(--accent); border-radius: var(--radius-md); padding: 0.6rem 0.75rem;
+            margin-top: 0.75rem; display: none;
+        }
+        .pickup-note.visible { display: block; }
+        .address-fields.collapsed { display: none; }
+
+        .form-vertical { display: flex; flex-direction: column; gap: 0.85rem; margin-top: 0.9rem; }
+        .form-group { display: flex; flex-direction: column; gap: 0.35rem; width: 100%; }
+        .form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
+        .form-group .field-hint { font-size: 0.68rem; color: var(--text-muted); font-weight: 400; text-transform: none; letter-spacing: 0; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.65rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-md);
+            background: var(--background); color: var(--text-main); font-size: 0.9rem; font-family: var(--font-body);
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(59,15,19,0.05) inset;
+        }
+        .form-group select {
+            appearance: none; -webkit-appearance: none; cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237C6A57' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 0.75rem center; padding-right: 2rem;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); background: var(--surface); }
+        .form-group input:invalid:not(:placeholder-shown) { border-color: var(--danger); }
+
+        .summary-box { display: flex; flex-direction: column; }
+        .cart-items-list { list-style: none; margin-bottom: 1rem; max-height: 160px; overflow-y: auto; }
+        .cart-item-row { display: flex; justify-content: space-between; font-size: 0.85rem; padding: 0.4rem 0; border-bottom: 1px solid var(--border); }
+
+        .coupon-row { display: flex; gap: 0.5rem; margin: 0.75rem 0 0.25rem; }
+        .coupon-row input { flex: 1; text-transform: uppercase; }
+        .btn-apply {
+            padding: 0 0.9rem; border-radius: var(--radius-md); border: 1.5px solid var(--secondary-deep);
+            background: var(--surface); color: var(--primary); font-family: var(--font-btn); font-weight: 700;
+            font-size: 0.78rem; cursor: pointer; transition: var(--transition); white-space: nowrap;
+            box-shadow: var(--emboss-raised);
+        }
+        .btn-apply:hover { background: linear-gradient(180deg, var(--secondary-bright), var(--secondary)); color: var(--primary-deep); }
+        .btn-apply:active { box-shadow: var(--emboss-pressed); transform: translateY(1px); }
+        .coupon-feedback { font-size: 0.72rem; min-height: 1rem; }
+        .coupon-feedback.error { color: var(--danger); }
+        .coupon-feedback.success { color: var(--success); }
+
+        .totals-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem; }
+        .totals-table td { padding: 0.4rem 0; }
+        .totals-table tr.row-discount { color: var(--success); display: none; }
+        .totals-table tr.row-discount.visible { display: table-row; }
+        .totals-table tr.grand-total { font-size: 1.15rem; font-weight: 700; color: var(--primary); border-top: 2px solid var(--secondary); }
+        .totals-table tr.grand-total td { padding-top: 0.65rem; letter-spacing: 0.01em; }
+
+        .delivery-fee-input {
+            width: 72px; text-align: right; border: 1px solid var(--border); border-radius: 4px;
+            background: var(--background); color: var(--text-main); font-family: var(--font-mono);
+            font-size: 0.85rem; padding: 2px 6px; transition: var(--transition);
+        }
+        .delivery-fee-input:disabled { opacity: 0.4; }
+
+        /* --- QR / PAYMENT --- */
+        .qr-wrapper {
+            border: 2px solid var(--border); border-radius: var(--radius-lg);
+            padding: 0.85rem; background: var(--surface); transition: border-color 0.25s, box-shadow 0.25s;
+            box-shadow: var(--wire-glow);
+        }
+        .qr-wrapper.active { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(201,162,39,0.16), var(--wire-glow); }
+        [data-theme="dark"] .qr-wrapper.active { box-shadow: 0 0 0 3px rgba(232,199,102,0.2); }
+        .qr-image { width: 100%; aspect-ratio: 1 / 1; object-fit: contain; display: block; border-radius: var(--radius-md); }
+        .qr-placeholder-box {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            aspect-ratio: 1 / 1; color: var(--text-muted); font-size: 0.82rem; line-height: 1.8; text-align: center;
+        }
+        .qr-amount-tag {
+            margin-top: 0.85rem;
+            display: flex; align-items: center; justify-content: space-between;
+            background: linear-gradient(180deg, var(--primary), var(--primary-deep)); color: var(--secondary-bright);
+            padding: 0.8rem 1.1rem; border-radius: var(--radius-md); width: 100%;
+            box-shadow: var(--emboss-raised);
+        }
+        .qr-amount-tag.zero { background: var(--border); color: var(--text-muted); box-shadow: none; }
+        .qr-amount-label {
+            font-size: 0.72rem; font-family: var(--font-btn); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.07em; opacity: 0.9;
+        }
+        .qr-amount-value { font-family: var(--font-mono); font-size: 1.6rem; font-weight: 700; letter-spacing: 0.01em; }
+        .qr-hint { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.6rem; line-height: 1.7; text-align: center; }
+
+        /* --- UPDATE NOW (cache-busting reload button) --- */
+        .btn-update-now {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            z-index: 9970;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: linear-gradient(180deg, #D6413A, var(--danger));
+            color: #FFFFFF;
+            font-family: var(--font-btn);
+            font-weight: 700;
+            font-size: 0.82rem;
+            letter-spacing: 0.02em;
+            border: none;
+            border-radius: 999px;
+            padding: 0.7rem 1.15rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lift), var(--emboss-raised);
+            transition: var(--transition);
+        }
+        .btn-update-now:hover { background: linear-gradient(180deg, #C62828, #9E1F1F); transform: translateY(-2px); }
+        .btn-update-now:active { transform: translateY(0) scale(0.97); box-shadow: var(--emboss-pressed); }
+        .btn-update-now .bun-icon { font-size: 0.95rem; line-height: 1; animation: bun-spin 3.5s linear infinite; }
+        @keyframes bun-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) {
+            .btn-update-now .bun-icon { animation: none; }
+        }
+        @media (max-width: 768px) {
+            .btn-update-now { left: 14px; bottom: 84px; padding: 0.6rem 1rem; font-size: 0.76rem; }
+        }
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--secondary-deep); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+
+        /* --- BUTTON SYSTEM ---
+           Every button shares the same cast-brass bevel: raised at rest,
+           pressed-in on click — the tactile signature carried through
+           from the header medallion and the mode tabs above. */
+        .btn-group { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.5rem; }
+        .btn-row { display: flex; gap: 0.6rem; }
+        .btn-row .btn { flex: 1; }
+        .btn {
+            padding: 0.75rem; border: none; border-radius: var(--radius-md); cursor: pointer;
+            font-family: var(--font-btn); font-weight: 600; font-size: 0.85rem; text-align: center;
+            text-decoration: none; transition: var(--transition);
+            box-shadow: var(--emboss-raised);
+        }
+        .btn:active { box-shadow: var(--emboss-pressed); transform: translateY(1px); }
+        .btn-primary { background: linear-gradient(180deg, var(--primary), var(--primary-deep)); color: white; }
+        .btn-primary:hover { background: linear-gradient(180deg, #7A252C, #4A1418); }
+        .btn-secondary { background: linear-gradient(180deg, var(--surface), var(--border)); color: var(--text-main); }
+        .btn-secondary:hover { background: linear-gradient(180deg, var(--secondary-bright), var(--secondary)); color: var(--primary-deep); }
+        .btn-danger { background: var(--surface); color: var(--danger); border: 1.5px solid var(--danger); box-shadow: none; }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
+        .btn-danger:active { transform: translateY(1px); }
+        .btn-whatsapp {
+            background: linear-gradient(180deg, #2CE374, #1FA855); color: white; display: flex; align-items: center; justify-content: center;
+            gap: 0.55rem; font-size: 0.95rem; padding: 0.9rem 1rem; letter-spacing: 0.01em;
+        }
+        .btn-whatsapp:hover { background: linear-gradient(180deg, #22C265, #128C7E); }
+
+        /* --- TOASTS --- */
+        .toast-container { position: fixed; bottom: 1.25rem; right: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; z-index: 9999; }
+        .toast {
+            background: linear-gradient(180deg, var(--primary), var(--primary-deep)); color: #fff; padding: 0.7rem 1rem; border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lift); font-family: var(--font-btn); font-size: 0.83rem;
+            display: flex; align-items: center; gap: 0.5rem; animation: toast-in 0.3s var(--spring); max-width: 300px;
+        }
+        .toast.error { background: linear-gradient(180deg, #D6413A, var(--danger)); }
+        .toast.success { background: linear-gradient(180deg, #3E9142, var(--success)); }
+        .toast.info { background: linear-gradient(180deg, #4A3A30, var(--text-main)); }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(8px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* --- MODAL (replaces jarring native alert/confirm) --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(21, 10, 11, 0.6); display: flex;
+            align-items: center; justify-content: center; z-index: 10000; padding: 1rem;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-box {
+            background: var(--surface); border-radius: var(--radius-lg); padding: 1.6rem;
+            max-width: 380px; width: 100%; box-shadow: 0 24px 60px rgba(0,0,0,0.4), var(--wire-glow);
+            border-top: 3px solid var(--secondary);
+            animation: toast-in 0.22s var(--spring);
+        }
+        .modal-box h3 { font-family: var(--font-heading); color: var(--heading-color); margin-bottom: 0.6rem; font-size: 1.2rem; }
+        .modal-box p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.3rem; white-space: pre-line; }
+        .modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; }
+        .modal-actions .btn { padding: 0.6rem 1.1rem; }
+
+        /* --- MOBILE STICKY CART BAR --- */
+        .mobile-cart-bar {
+            display: none; position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, var(--primary), var(--primary-deep));
+            color: #fff; padding: 0.85rem 1.1rem; align-items: center; justify-content: space-between;
+            z-index: 9998; box-shadow: 0 -6px 18px rgba(0,0,0,0.22); font-family: var(--font-btn); cursor: pointer;
+            border-top: 2px solid var(--secondary);
+        }
+        .mobile-cart-bar.visible { display: flex; }
+        .mobile-cart-bar .mcb-left { display: flex; align-items: center; gap: 0.6rem; font-size: 0.85rem; }
+        .mobile-cart-bar .mcb-count {
+            background: rgba(255,255,255,0.25); border-radius: 50%; width: 24px; height: 24px;
+            display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 0.75rem;
+        }
+        .mobile-cart-bar strong { font-family: var(--font-mono); color: var(--secondary-bright); }
+
+        /* --- PRINT RECEIPT --- */
+        #print-receipt-window { display: none; }
+        @media print {
+            body * { display: none !important; }
+            #print-receipt-window, #print-receipt-window * { display: block !important; }
+            #print-receipt-window {
+                display: block !important; position: absolute; left: 0; top: 0; width: 80mm;
+                padding: 4mm; font-family: var(--font-mono); color: #000; background: #fff; font-size: 12px;
+            }
+            .receipt-header { text-align: center; margin-bottom: 4mm; }
+            .receipt-header h2 { font-family: var(--font-heading); font-size: 16px; margin-bottom: 1mm; }
+            .receipt-divider { border-top: 1px dashed #000; margin: 2mm 0; }
+            .receipt-row { display: flex; justify-content: space-between; margin: 1mm 0; }
+            .receipt-items-table { width: 100%; border-collapse: collapse; margin: 2mm 0; }
+            .receipt-items-table th { text-align: left; border-bottom: 1px dashed #000; font-size: 11px; }
+            .receipt-items-table td { padding: 1mm 0; font-size: 12px; }
+            .text-right { text-align: right; }
+            .qr-placeholder { text-align: center; margin-top: 4mm; font-size: 9px; }
+        }
+
+        /* --- UPI BUTTON --- */
+        .btn-upi {
+            background: linear-gradient(135deg, #6B21E8, #9333EA); color: white;
+            display: flex; align-items: center; justify-content: center;
+            gap: 0.5rem; font-size: 0.95rem; padding: 0.9rem 1rem;
+        }
+        .btn-upi:hover { background: linear-gradient(135deg, #5B11D8, #7E22CE); }
+
+        /* --- COLLAPSIBLE TOGGLE ICON (hidden on desktop) --- */
+        .category-toggle-icon { display: none; font-size: 0.75rem; color: var(--text-muted); transition: transform 0.25s ease; flex-shrink: 0; padding: 4px; }
+
+        /* --- MOBILE OVERLAY --- */
+        .mobile-overlay { display: none; position: fixed; inset: 0; background: rgba(21,10,11,0.5); z-index: 900; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); }
+        .mobile-overlay.active { display: block; }
+
+        /* --- SIDEBAR BACK BUTTON (mobile only) --- */
+        .sidebar-close-btn { display: none; }
+
+        @media (max-width: 1024px) {
+            .app-container { grid-template-columns: 1fr; }
+            .sidebar { height: auto; position: relative; border-left: none; border-top: 1px solid var(--border); }
+            .main-content { max-height: none; overflow-y: visible; padding-bottom: 5rem; min-width: 0; }
+            .controls-row { position: static; }
+            .search-shortcut-hint { display: none; }
+            body { padding-bottom: 0; }
+        }
+
+        @media (max-width: 768px) {
+            .status-board { flex-direction: column; gap: 0.3rem; font-size: 0.72rem; padding: 0.5rem 1rem; }
+            .status-board .divider { display: none; }
+            .pos-header { grid-template-columns: 120px 1fr; gap: 0.6rem; padding: 0.75rem 1rem; }
+            .brand-logo { max-height: 62px; }
+            .header-center h1 { font-size: 1.3rem; }
+            .header-center p { font-size: 0.72rem; }
+            .main-content { padding: 0 1rem 6rem; min-width: 0; }
+            .controls-row { flex-direction: column; align-items: stretch; gap: 0.6rem; }
+            .search-wrapper { min-width: unset; }
+            .category-pills { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: none; width: 100%; min-width: 0; }
+            .category-pills::-webkit-scrollbar { display: none; }
+            .pill { white-space: nowrap; flex-shrink: 0; }
+            .theme-toggle { align-self: flex-start; }
+            .menu-grid { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+            .category-card { max-width: 100%; overflow: hidden; }
+            .category-card:hover { transform: none; }
+            .category-title { cursor: pointer; user-select: none; -webkit-user-select: none; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; }
+            .category-toggle-icon { display: inline-block; }
+            .category-card.collapsed .menu-items-body { display: none; }
+            .category-card.collapsed .category-title { border-bottom-color: transparent; margin-bottom: 0; padding-bottom: 0; }
+            .category-card.collapsed { padding-bottom: 0.75rem; }
+            .category-card.collapsed .category-toggle-icon { transform: rotate(-90deg); }
+            .qty-btn { width: 36px; height: 36px; font-size: 1.1rem; }
+            .qty-input { width: 42px; height: 36px; }
+            .sidebar {
+                position: fixed; bottom: 0; left: 0; right: 0; top: auto; height: 88vh;
+                z-index: 950; border-radius: 20px 20px 0 0; border-top: 2px solid var(--secondary);
+                border-left: none; transform: translateY(100%);
+                transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                overflow-y: auto; padding: 0 1.25rem 2rem;
+            }
+            .sidebar::before { content: ''; display: block; width: 44px; height: 4px; background: var(--secondary-deep); border-radius: 2px; margin: 0.85rem auto 1rem; }
+            .sidebar.mobile-open { transform: translateY(0); }
+            .sidebar-close-btn {
+                display: flex; align-items: center; gap: 0.5rem; width: 100%;
+                background: var(--surface); border: 1.5px solid var(--primary); border-radius: var(--radius-md);
+                padding: 0.7rem 1rem; font-family: var(--font-btn); font-weight: 700; font-size: 0.88rem;
+                color: var(--primary); cursor: pointer; margin-bottom: 0.5rem; transition: var(--transition);
+            }
+            .sidebar-close-btn:hover { background: var(--primary); color: white; }
+            .mobile-cart-bar { z-index: 940; }
+        }
+
+        @media (max-width: 480px) {
+            .pos-header { grid-template-columns: 92px 1fr; padding: 0.6rem 0.75rem; }
+            .brand-logo { max-height: 46px; }
+            .header-center h1 { font-size: 1.05rem; }
+            .main-content { padding: 0 0.75rem 6rem; }
+        }
+    </style>
+    <style>
+        /* ============================================================
+           MOTION SYSTEM
+           One spring curve reused everywhere: a staggered load-in
+           (plaque, nameplate, tabs, menu settle into place like lamps
+           lit down a counter), plus small tactile cart feedback —
+           a button pulse on tap, a pop on the totals when they change.
+           Fully disabled under prefers-reduced-motion.
+        ============================================================ */
+        @keyframes settle-in {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .status-board, .announcement-bar.visible, .pos-header, .mode-tabs,
+        .schedule-card.visible, .controls-row, .menu-grid, .sidebar {
+            animation: settle-in 0.55s var(--spring) both;
+        }
+        .status-board            { animation-delay: 0.02s; }
+        .announcement-bar.visible{ animation-delay: 0.06s; }
+        .pos-header               { animation-delay: 0.10s; }
+        .mode-tabs                 { animation-delay: 0.17s; }
+        .controls-row                { animation-delay: 0.23s; }
+        .menu-grid                     { animation-delay: 0.28s; }
+        .sidebar                         { animation-delay: 0.34s; }
+
+        @keyframes qty-pulse {
+            0%   { transform: scale(1); }
+            40%  { transform: scale(1.22); }
+            100% { transform: scale(1); }
+        }
+        .qty-btn.pulse { animation: qty-pulse 0.32s var(--spring); }
+
+        @keyframes row-in {
+            from { opacity: 0; transform: translateX(6px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .cart-item-row { animation: row-in 0.3s var(--spring) both; }
+
+        @keyframes total-pop {
+            0%   { transform: scale(1); }
+            45%  { transform: scale(1.09); color: var(--secondary-deep); }
+            100% { transform: scale(1); }
+        }
+        #summary-grand-total.pop, #qr-amount-display.pop { animation: total-pop 0.4s var(--spring); display: inline-block; }
+
+        @keyframes badge-pop {
+            0% { transform: scale(0.4); opacity: 0; }
+            60% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+        .pill-badge { animation: badge-pop 0.3s var(--spring); }
+
+        @media (max-width: 768px) {
+            /* The mobile sidebar slides up from translateY(100%) via its own
+               CSS transition. The global settle-in animation overrides that
+               transform (animation-fill-mode: both), making the sidebar
+               visible on load and preventing "Back to Menu" from hiding it. */
+            .sidebar { animation: none !important; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .status-board, .announcement-bar.visible, .pos-header, .mode-tabs,
+            .schedule-card.visible, .controls-row, .menu-grid, .sidebar,
+            .qty-btn.pulse, .cart-item-row, #summary-grand-total.pop,
+            #qr-amount-display.pop, .pill-badge {
+                animation: none !important;
+            }
+        }
+    </style>
+    <style>
+        /* ============================================================
+           COPY PROTECTION (deterrent only — see note in JS below)
+        ============================================================ */
+        html, body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none; /* iOS long-press menu */
+        }
+        /* Keep normal typing/selecting inside form fields usable */
+        input, textarea, [contenteditable="true"] {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+        img {
+            -webkit-user-drag: none;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="status-board crystal" id="status-board" role="status" aria-live="polite">
+        <div class="seg"><span class="status-dot" id="kitchen-dot"></span><span id="kitchen-status-text">Checking kitchen status…</span></div>
+        <span class="divider">•</span>
+        <div class="seg"><span class="veg-mark"></span><span>100% Pure Vegetarian</span></div>
+        <span class="divider">•</span>
+        <div class="seg"><span>⏱ Serving Hours: 06:00 – 22:00</span></div>
+    </div>
+
+    <div class="announcement-bar" id="announcement-bar" role="status" aria-live="polite">
+        <span class="ab-icon" id="announcement-icon">📣</span>
+        <span class="ab-text" id="announcement-text"></span>
+        <button class="ab-close" id="announcement-close" aria-label="Dismiss announcement">✕</button>
+    </div>
+
+    <div class="app-container">
+
+        <main class="main-content">
+
+            <header class="pos-header crystal">
+                <div class="header-left">
+                    <img src="Amruthadharanam_logo2.png" alt="Amruthadhaaranam Logo" class="brand-logo"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                    <div class="brand-logo-fallback" style="display:none;">AD</div>
+                </div>
+                <div class="header-center">
+                    <h1>AMRUTHADHAARANAM</h1>
+                    <p>Freshly Crafted Snacks &amp; Refreshing Beverages</p>
+                </div>
+            </header>
+
+            <div class="mode-tabs" id="mode-tabs" role="group" aria-label="Ordering mode">
+                <button type="button" class="mode-tab active" data-mode="Instant" aria-pressed="true">⚡ Today's Order Menu</button>
+                <button type="button" class="mode-tab" data-mode="Future" aria-pressed="false">📅 Future Order</button>
+            </div>
+
+            <div class="schedule-card crystal" id="future-schedule-card">
+                <h3 class="schedule-card-title">📅 Future Delivery</h3>
+                <div class="schedule-card-fields">
+                    <div class="form-group">
+                        <label for="future-date">Delivery Date *</label>
+                        <input type="date" id="future-date">
+                    </div>
+                    <div class="form-group">
+                        <label for="future-time">Delivery Time * <span class="field-hint">— between 9:00 AM &amp; 10:00 PM</span></label>
+                        <input type="time" id="future-time" min="09:00" max="22:00">
+                    </div>
+                </div>
+                <p class="schedule-card-hint">This date &amp; time apply to your entire order below — pick your items as usual, then confirm. Delivery date can be chosen from tomorrow up to 7 days ahead, and delivery time must fall between 9:00 AM and 10:00 PM.</p>
+            </div>
+
+            <div class="controls-row">
+                <div class="search-wrapper">
+                    <input type="text" id="txt-search" class="search-input" placeholder="Search menu items (e.g., Cake, Pastry, Idli, Maggi, Pasta)..." aria-label="Search menu">
+                    <span class="search-shortcut-hint">/</span>
+                </div>
+                <div class="category-pills" id="category-pills-container"></div>
+                <button id="btn-theme" class="theme-toggle" title="Toggle Dark/Light Mode" aria-label="Toggle dark mode"><span id="theme-icon">🌙</span><span id="theme-label">Dark Mode</span></button>
+            </div>
+
+            <div class="menu-grid" id="menu-container"></div>
+        </main>
+
+        <aside class="sidebar">
+
+            <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Back to menu">&#8592; Back to Menu</button>
+
+            <section>
+                <h3 class="step-title"><span class="step-num">1</span> Order Type</h3>
+                <div class="segmented" id="order-type-toggle" role="group" aria-label="Order type">
+                    <button type="button" class="active" data-type="Delivery">🛵 Delivery</button>
+                    <button type="button" data-type="Pickup">🏠 Self Pickup</button>
+                </div>
+                <p class="pickup-note" id="pickup-note">Customer will collect at the counter — address fields are hidden and delivery fee is waived.</p>
+            </section>
+
+            <section>
+                <h3 class="step-title"><span class="step-num">2</span> Your Details</h3>
+                <form id="form-customer" class="form-vertical" style="margin-top:0;">
+                    <div class="form-group">
+                        <label for="cust-name">Customer Name *</label>
+                        <input type="text" id="cust-name" required placeholder="Enter customer name">
+                    </div>
+                    <div class="form-group">
+                        <label for="cust-phone">Phone Number * <span class="field-hint">— 10 digits, used for WhatsApp</span></label>
+                        <input type="tel" id="cust-phone" required pattern="[0-9]{10}" maxlength="10" inputmode="numeric" placeholder="Enter 10-digit number">
+                    </div>
+                    <div class="address-fields" id="address-fields">
+                        <div class="form-group">
+                            <label for="cust-door">Door / Flat No *</label>
+                            <input type="text" id="cust-door" required placeholder="e.g., Door G-4 / Flat B404">
+                        </div>
+                        <div class="form-group">
+                            <label for="cust-apart">Apartment / Villa</label>
+                            <select id="cust-apart">
+                                <option value="SIDHHARTH DHAKSHIN Apts" selected>SIDHHARTH DHAKSHIN Apts</option>
+                                 <option value="NATWEST Apts">NATWEST Apts</option>
+                                 <option value="MARUTHAM Apts">MARUTHAM Apts</option>
+                                <option value="URBAN TREE Apts">URBAN TREE Apts</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="cust-notes">Notes for Kitchen / Delivery</label>
+                        <textarea id="cust-notes" rows="2" style="resize:none;" placeholder="Special packaging, spice level, or route instructions..."></textarea>
+                    </div>
+                </form>
+            </section>
+
+            <section class="summary-box">
+                <h3 class="step-title"><span class="step-num">3</span> Order Summary</h3>
+                <div class="order-ref-chip">
+                    <span>Order Reference</span>
+                    <span id="lbl-order-no" class="order-ref-value">#AD-20260707-0000</span>
+                </div>
+                <div class="cart-schedule-note" id="cart-schedule-note"></div>
+                <ul class="cart-items-list" id="cart-items-preview" aria-live="polite"></ul>
+
+                <div class="coupon-row">
+                    <input type="text" id="input-coupon" placeholder="Promo code" aria-label="Promo code">
+                    <button type="button" class="btn-apply" id="btn-apply-coupon">Apply</button>
+                </div>
+                <div class="coupon-feedback" id="coupon-feedback"></div>
+
+                <table class="totals-table">
+                    <tr>
+                        <td>Total Unique Items</td>
+                        <td class="text-right" id="summary-unique-items">0</td>
+                    </tr>
+                    <tr>
+                        <td>Total Basket Quantity</td>
+                        <td class="text-right" id="summary-total-qty">0</td>
+                    </tr>
+                    <tr>
+                        <td>Subtotal</td>
+                        <td class="text-right" id="summary-subtotal">₹0.00</td>
+                    </tr>
+                    <tr class="row-discount" id="row-discount">
+                        <td>Discount <span id="discount-code-label"></span></td>
+                        <td class="text-right" id="summary-discount">−₹0.00</td>
+                    </tr>
+                    <tr id="row-delivery-fee">
+                        <td>Delivery Fee (₹)</td>
+                        <td class="text-right">
+                            <input type="number" id="input-delivery-fee" min="0" value="0" step="5" class="delivery-fee-input" aria-label="Set delivery fee in rupees">
+                        </td>
+                    </tr>
+                    <tr class="grand-total">
+                        <td>Grand Total</td>
+                        <td class="text-right" id="summary-grand-total">₹0.00</td>
+                    </tr>
+                </table>
+
+            </section>
+
+            <section class="qr-pay-section">
+                <h3 class="step-title"><span class="step-num">4</span> Payment &amp; Confirm</h3>
+
+                <div class="qr-wrapper crystal" id="qr-wrapper">
+                    <img src="qr.jpeg" alt="UPI Payment QR Code" class="qr-image"
+                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                    <div class="qr-placeholder-box">
+                        📲 Add your QR image<br>named <strong>qr.jpeg</strong><br>to this folder
+                    </div>
+                </div>
+                <div class="qr-amount-tag zero" id="qr-amount-tag">
+                    <span class="qr-amount-label">Amount Due</span>
+                    <span class="qr-amount-value" id="qr-amount-display">₹0.00</span>
+                </div>
+                <p class="qr-hint">PhonePe &nbsp;•&nbsp; GPay &nbsp;•&nbsp; Paytm &nbsp;•&nbsp; Any UPI App</p>
+            </section>
+
+            <div class="btn-group">
+                <button id="trigger-whatsapp" class="btn btn-whatsapp">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="white" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    <span id="whatsapp-btn-label">Place Order</span>
+                </button>
+                <button id="trigger-reset" class="btn btn-danger">🔄 Reset Order</button>
+            </div>
+        </aside>
+    </div>
+
+    <button id="btn-update-now" class="btn-update-now" title="Clear cache and load the newest version of this page">
+        <span class="bun-icon">⟳</span> Update Now
+    </button>
+
+    <div class="mobile-overlay" id="mobile-overlay"></div>
+
+    <div class="mobile-cart-bar" id="mobile-cart-bar">
+        <div class="mcb-left">
+            <span class="mcb-count" id="mobile-cart-count">0</span>
+            <span>View order</span>
+        </div>
+        <strong id="mobile-cart-total">₹0.00</strong>
+    </div>
+
+    <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+    <div class="modal-overlay hidden" id="modal-overlay">
+        <div class="modal-box crystal" role="dialog" aria-modal="true">
+            <h3 id="modal-title">Title</h3>
+            <p id="modal-message">Message</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+                <button class="btn btn-primary" id="modal-confirm-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="print-receipt-window">
+        <div class="receipt-header">
+            <h2>AMRUTHADHAARANAM</h2>
+            <p>Freshly Crafted Snacks &amp; Beverages</p>
+        </div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-row"><span>Order No:</span><span id="print-order-no"></span></div>
+        <div class="receipt-row"><span>Date/Time:</span><span id="print-datetime"></span></div>
+        <div class="receipt-row"><span>Order Type:</span><span id="print-order-type"></span></div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-row"><strong>Customer Details:</strong></div>
+        <div id="print-cust-info" style="font-size: 11px; margin-bottom: 2mm;"></div>
+        <div class="receipt-divider"></div>
+        <table class="receipt-items-table">
+            <thead>
+                <tr>
+                    <th>Item Description</th>
+                    <th class="text-right" style="width:15mm;">Qty x Price</th>
+                    <th class="text-right" style="width:15mm;">Amt</th>
+                </tr>
+            </thead>
+            <tbody id="print-items-body"></tbody>
+        </table>
+        <div class="receipt-divider"></div>
+        <div class="receipt-row"><span>Total Items Qty:</span><span id="print-total-qty"></span></div>
+        <div class="receipt-row" id="print-discount-row" style="display:none;"><span>Discount:</span><span id="print-discount"></span></div>
+        <div class="receipt-row"><span>Delivery Fee:</span><span id="print-delivery"></span></div>
+        <div class="receipt-row" style="font-size: 14px; font-weight: bold;"><span>Grand Total:</span><span id="print-grand-total"></span></div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-header" style="margin-top: 4mm;">
+            <p>Thank You! Visit Again</p>
+            <div class="qr-placeholder">
+                <div style="border: 1px solid #000; width: 25mm; height: 25mm; margin: 2mm auto; display: flex; align-items: center; justify-content: center; font-size: 8px;">Scan to Pay</div>
+                <p>Order generated via Amruthadhaaranam Online Ordering</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Central menu registry: all items, active flags, IDs for both menus -->
+    <script src="menu-data.js"></script>
+
+    <script>
+        /* ================================================================
+           SITE SETTINGS
+           Loaded from settings.json at startup (written by control-panel).
+           All values here are fallback defaults used when the server is
+           unreachable or settings.json hasn't been created yet.
+        ================================================================ */
+        const SETTINGS = {
+            storeClosed: false,
+            announcement: {
+                enabled: true,
+                type:    "offer",
+                icon:    "🎉",
+                text:    "Announcement: <strong>Introducing FUTURE ORDER ! You can plan your order item for the next 14 days and Stay confident !!!</strong> !",
+                blink:   true
+            },
+            whatsapp:       "917845387741",
+            upi:            "prabhunandhu-2@oksbi",
+            deliveryCharge: 0,
+            coupons: {
+                "AMRUTH10": { type: "percent", value: 10, label: "10% off",            enabled: true },
+                "FLAT50":   { type: "flat",    value: 50, label: "₹50 off",            enabled: true },
+                "WELCOME5": { type: "percent", value: 5,  label: "5% welcome discount", enabled: true }
+            },
+            itemVisibility: {},
+            daySchedule:    {},
+            customItems:     [],
+            deletedItems:    [],
+            favouriteItems:  [],
+            priceOverrides:  {}
+        };
+
+        // Fetches settings.json from the server and merges into SETTINGS.
+        // Falls back silently to the inline defaults if the fetch fails.
+        async function loadSettings() {
+            try {
+                const res = await fetch('settings.json?_t=' + Date.now());
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                Object.assign(SETTINGS, data);
+            } catch (e) {
+                console.warn('[settings] Could not load settings.json —', e.message, '— using defaults.');
+            }
+        }
+
+        const _ALL_ITEMS_FLAT = Object.values(MENU_DATA_BY_MODE).flat();
+
+        // Returns visible items for the current mode, filtered by staff
+        // visibility settings (SETTINGS.itemVisibility) and today's day schedule.
+        function getMenuData() {
+            const today      = new Date().getDay(); // 0=Sun … 6=Sat
+            const vis            = SETTINGS.itemVisibility || {};
+            const sched          = SETTINGS.daySchedule    || {};
+            const deletedSet     = new Set(SETTINGS.deletedItems   || []);
+            const favSet         = new Set(SETTINGS.favouriteItems || []);
+            const priceOverrides = SETTINGS.priceOverrides || {};
+
+            function applyFav(item) {
+                return favSet.has(item.id) ? Object.assign({}, item, { favourite: true }) : item;
+            }
+
+            function applyPriceOverrides(item) {
+                return Object.assign({}, item, priceOverrides[item.id] || {});
+            }
+
+            const baseItems = MENU_DATA_BY_MODE[POSState.orderMode].filter(function(item) {
+                if (deletedSet.has(item.id)) return false;
+                if (Object.prototype.hasOwnProperty.call(vis, item.id)) {
+                    if (!vis[item.id]) return false;
+                } else if (item.active === false) {
+                    return false;
+                }
+                const days = sched[item.id];
+                if (days && days.length > 0 && !days.includes(today)) return false;
+                return true;
+            }).map(function(item) {
+                return applyFav(applyPriceOverrides(item));
+            });
+
+            // Merge custom items added via Control Panel (stored in settings.json)
+            const customItems = (SETTINGS.customItems || []).filter(function(item) {
+                if (item.active === false) return false;
+                if (deletedSet.has(item.id)) return false;
+                if (!(item.modes || []).includes(POSState.orderMode)) return false;
+                if (Object.prototype.hasOwnProperty.call(vis, item.id) && !vis[item.id]) return false;
+                const days = sched[item.id];
+                if (days && days.length > 0 && !days.includes(today)) return false;
+                return true;
+            }).map(function(item) {
+                return applyFav(applyPriceOverrides(item));
+            });
+
+            return baseItems.concat(customItems);
+        }
+
+        function formatTerminalPriceLabel(item) {
+            if (item.oldPrice && Number(item.oldPrice) > Number(item.price)) {
+                return `
+                    <span class="item-price">
+                        <span class="item-old-price">₹${item.oldPrice.toFixed(2)}</span>
+                        <span class="item-current-price">₹${item.price.toFixed(2)}</span>
+                    </span>
+                `;
+            }
+            return `<span class="item-price">₹${item.price.toFixed(2)}</span>`;
+        }
+
+        // Finds an item by ID even if it is currently hidden (for cart pricing).
+        function findItemById(id) {
+            const visibleItem = getMenuData().find(function(m) { return m.id === id; });
+            if (visibleItem) return visibleItem;
+
+            const priceOverrides = SETTINGS.priceOverrides || {};
+            const baseItem = _ALL_ITEMS_FLAT.find(function(m) { return m.id === id; });
+            if (baseItem) {
+                const overridden = Object.assign({}, baseItem, priceOverrides[baseItem.id] || {});
+                if ((SETTINGS.favouriteItems || []).includes(baseItem.id)) {
+                    overridden.favourite = true;
+                }
+                return overridden;
+            }
+
+            const customItem = (SETTINGS.customItems || []).find(function(m) { return m.id === id; });
+            if (customItem) return Object.assign({}, customItem, priceOverrides[customItem.id] || {});
+            return null;
+        }
+
+        // Promo codes come from SETTINGS.coupons (loaded from settings.json).
+
+        const OPEN_HOUR = 6;   // 6:00 AM
+        const CLOSE_HOUR = 22; // 10:00 PM
+
+        // Future Order's allowed delivery-time window. Narrower than the
+        // kitchen's general OPEN_HOUR/CLOSE_HOUR above by request — pre-
+        // orders may only be scheduled between 9 AM and 10 PM.
+        const FUTURE_ORDER_MIN_MINUTES = 9 * 60;   // 09:00
+        const FUTURE_ORDER_MAX_MINUTES = 22 * 60;  // 22:00
+
+        // Returns true only for a "HH:MM" string inside the Future Order
+        // delivery window. Used both live (on the time field's change
+        // event) and again at submit time, since a browser's native time
+        // picker doesn't reliably block manually-typed out-of-range values.
+        function isFutureTimeWithinWindow(timeStr) {
+            if (!timeStr) return false;
+            const [h, m] = timeStr.split(":").map(Number);
+            if (Number.isNaN(h) || Number.isNaN(m)) return false;
+            const mins = h * 60 + m;
+            return mins >= FUTURE_ORDER_MIN_MINUTES && mins <= FUTURE_ORDER_MAX_MINUTES;
+        }
+
+        // Future Order's allowed delivery-date window: tomorrow through
+        // 15 days after tomorrow (16 selectable dates total). Same-day
+        // scheduling isn't offered here — that's what Today's Order Menu
+        // (Instant) is for.
+        const FUTURE_ORDER_DATE_MIN_OFFSET_DAYS = 1;   // tomorrow
+        const FUTURE_ORDER_DATE_MAX_OFFSET_DAYS = 7;   // up to 7 days ahead
+
+        function toISODateLocal(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        // Returns { min, max } as "YYYY-MM-DD" strings for the future-date
+        // field's allowed range, computed fresh each time so it always
+        // reflects "today" at the moment it's called.
+        function getFutureDateBounds() {
+            const now = new Date();
+            const minDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + FUTURE_ORDER_DATE_MIN_OFFSET_DAYS);
+            const maxDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + FUTURE_ORDER_DATE_MAX_OFFSET_DAYS);
+            return { min: toISODateLocal(minDate), max: toISODateLocal(maxDate) };
+        }
+
+        // Returns true only for a "YYYY-MM-DD" string inside the Future
+        // Order delivery-date window (tomorrow .. tomorrow+15). Used both
+        // live (on the date field's change event) and again at submit
+        // time, since a browser's native date picker doesn't reliably
+        // block manually-typed out-of-range values.
+        function isFutureDateWithinWindow(dateStr) {
+            if (!dateStr) return false;
+            const { min, max } = getFutureDateBounds();
+            return dateStr >= min && dateStr <= max;
+        }
+
+        const POSState = {
+            /* Independent carts per ordering mode — adding items under
+               Future Order never affects what's in Today's Order Menu,
+               and vice versa. Each is a plain id -> qty map. */
+            carts: { Instant: {}, Future: {} },
+            activeCategory: "ALL",
+            searchQuery: "",
+            deliveryCharge: 0.00,
+            orderType: "Delivery",
+            discount: { code: "", type: null, value: 0, label: "" },
+            orderId: "",
+            orderMode: "Instant",   // "Instant" | "Future"
+            schedule: { date: "", time: "" },
+
+            /* The ONE place that knows "which cart is active right now".
+               Every read/write of cart quantities goes through this so the
+               two carts can never accidentally cross-contaminate. */
+            getCart() {
+                return this.carts[this.orderMode];
+            },
+
+            init() {
+                this.generateOrderId();
+                this.carts = { Instant: {}, Future: {} };
+            },
+            generateOrderId() {
+                const now = new Date();
+                const stamp = now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0');
+                const rand = Math.floor(1000 + Math.random() * 9000);
+                this.orderId = `AD-${stamp}-${rand}`;
+            }
+        };
+
+        const UIEngine = {
+            init() {
+                this.renderCategories();
+                this.renderMenu();
+                this.updateTimestamp();
+                this.updateKitchenStatus();
+                this.renderAnnouncement();
+                this.bindEventHandlers();
+                this.syncTotals();
+                setInterval(() => { this.updateTimestamp(); this.updateKitchenStatus(); }, 15000);
+                document.getElementById("txt-search").focus();
+            },
+
+            /* ---------- ANNOUNCEMENT BANNER ---------- */
+            renderAnnouncement() {
+                const bar    = document.getElementById("announcement-bar");
+                const iconEl = document.getElementById("announcement-icon");
+                const textEl = document.getElementById("announcement-text");
+                const ann    = SETTINGS.announcement || {};
+
+                if (!ann.enabled || !ann.text) {
+                    bar.classList.remove("visible");
+                    return;
+                }
+
+                // Fingerprint the current message so a dismissal only
+                // suppresses THIS exact announcement, not future ones.
+                const fingerprint = `${ann.type}|${ann.text}`;
+                let hash = 0;
+                for (let i = 0; i < fingerprint.length; i++) {
+                    hash = (hash * 31 + fingerprint.charCodeAt(i)) | 0;
+                }
+                const storageKey = "ad_announcement_dismissed";
+                const dismissedHash = localStorage.getItem(storageKey);
+
+                if (dismissedHash === String(hash)) {
+                    bar.classList.remove("visible");
+                    return;
+                }
+
+                bar.className = `announcement-bar visible type-${ann.type || 'info'}`;
+                iconEl.textContent = ann.icon || "📣";
+                iconEl.classList.toggle("blinking", !!ann.blink);
+                textEl.innerHTML = ann.text;
+
+                document.getElementById("announcement-close").onclick = () => {
+                    localStorage.setItem(storageKey, String(hash));
+                    bar.classList.remove("visible");
+                };
+            },
+
+            /* ---------- KITCHEN STATUS BOARD ---------- */
+            updateKitchenStatus() {
+                const board = document.getElementById("status-board");
+                const dot   = document.getElementById("kitchen-dot");
+                const text  = document.getElementById("kitchen-status-text");
+                board.classList.remove("status-closing", "status-closed");
+
+                // Admin can mark store closed for a holiday / emergency
+                if (SETTINGS.storeClosed) {
+                    dot.className = "status-dot closed";
+                    board.classList.add("status-closed");
+                    text.textContent = "We're temporarily closed — please check back soon! 🙏";
+                    return;
+                }
+
+                const now = new Date();
+                const totalMins = now.getHours() * 60 + now.getMinutes();
+                const openMins  = OPEN_HOUR  * 60;
+                const closeMins = CLOSE_HOUR * 60;
+                const isOpen = totalMins >= openMins && totalMins < closeMins;
+                const minsToClose = closeMins - totalMins;
+                const isClosingSoon = isOpen && minsToClose <= 60;
+
+                if (!isOpen) {
+                    dot.className = "status-dot closed";
+                    board.classList.add("status-closed");
+                    text.textContent = `We're closed right now 🌙 — We'd love to serve you between 6:00 AM & 10:00 PM. See you soon! 🙏`;
+                } else if (isClosingSoon) {
+                    dot.className = "status-dot closing";
+                    board.classList.add("status-closing");
+                    text.textContent = `Closing soon — ${minsToClose} min left to order`;
+                } else {
+                    dot.className = "status-dot open";
+                    text.textContent = "Kitchen Open — accepting orders now";
+                }
+            },
+
+            /* ---------- CATEGORY PILLS ---------- */
+            renderCategories() {
+                const container = document.getElementById("category-pills-container");
+                const categories = ["ALL", ...new Set(getMenuData().map(item => item.category))];
+                const cart = POSState.getCart();
+
+                container.innerHTML = categories.map(cat => {
+                    const cartQty = cat === "ALL"
+                        ? Object.values(cart).reduce((a, b) => a + b, 0)
+                        : getMenuData().filter(i => i.category === cat)
+                                   .reduce((sum, i) => sum + (cart[i.id] || 0), 0);
+                    const badge = cartQty > 0 ? `<span class="pill-badge">${cartQty}</span>` : '';
+                    return `<button class="pill ${POSState.activeCategory === cat ? 'active' : ''}" data-category="${cat}">${cat.toUpperCase()}${badge}</button>`;
+                }).join('');
+            },
+
+            /* ---------- MENU GRID ---------- */
+            renderMenu() {
+                const container = document.getElementById("menu-container");
+
+                // On mobile, remember which panels are currently open so re-renders don't collapse them
+                const expandedTitles = new Set();
+                if (window.matchMedia('(max-width: 768px)').matches) {
+                    container.querySelectorAll('.category-card:not(.collapsed)').forEach(c => {
+                        const sp = c.querySelector('.category-title span:first-child');
+                        if (sp) expandedTitles.add(sp.textContent.trim());
+                    });
+                }
+
+                container.innerHTML = "";
+
+                const filteredItems = getMenuData().filter(item => {
+                    const matchCat = POSState.activeCategory === "ALL" || item.category === POSState.activeCategory;
+                    const matchSearch = item.name.toLowerCase().includes(POSState.searchQuery.toLowerCase());
+                    return matchCat && matchSearch;
+                });
+
+                if (filteredItems.length === 0) {
+                    container.innerHTML = `<div class="empty-results"><span class="empty-icon">🍽️</span>No dishes match "${POSState.searchQuery}". Try a different search or category.</div>`;
+                    return;
+                }
+
+                const groups = {};
+                filteredItems.forEach(item => {
+                    if (!groups[item.title]) groups[item.title] = [];
+                    groups[item.title].push(item);
+                });
+
+                for (const [title, items] of Object.entries(groups)) {
+                    const card = document.createElement("div");
+                    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+                    const shouldCollapse = isMobile && !expandedTitles.has(title);
+                    card.className = `category-card crystal${shouldCollapse ? ' collapsed' : ''}`;
+                    card.innerHTML = `
+                        <h3 class="category-title">
+                            <span>${title}</span>
+                            <span class="category-toggle-icon" aria-hidden="true">▼</span>
+                        </h3>
+                        <div class="menu-items-body"></div>
+                    `;
+                    const body = card.querySelector('.menu-items-body');
+                    items.forEach(item => {
+                        const currentQty = POSState.getCart()[item.id] || 0;
+                        const row = document.createElement("div");
+                        row.className = `menu-item${currentQty > 0 ? ' in-cart' : ''}${item.tomorrowSpecial ? ' tomorrow-special' : ''}`;
+                        row.innerHTML = `
+                            <div class="item-info">
+                                <h4>${item.name}${item.popular ? '<span class="badge-popular">★ Popular</span>' : ''}${item.favourite ? '<span class="badge-favourite">★ Staff Pick</span>' : ''}${item.tomorrowSpecial ? '<span class="badge-tomorrow">📅 Tomorrow Only</span>' : ''}</h4>
+                                ${formatTerminalPriceLabel(item)}
+                            </div>
+                            <div class="qty-controls">
+                                <button class="qty-btn btn-down" data-id="${item.id}" aria-label="Decrease quantity">−</button>
+                                <input type="number" class="qty-input" data-id="${item.id}" value="${currentQty}" min="0" aria-label="Quantity">
+                                <button class="qty-btn btn-up" data-id="${item.id}" aria-label="Increase quantity">+</button>
+                            </div>
+                        `;
+                        body.appendChild(row);
+                    });
+                    container.appendChild(card);
+                }
+            },
+
+            /* ---------- ORDERING MODE SWITCH (Today's Order Menu / Future Order) ----------
+               Single source of truth for everything that changes when the mode
+               changes: active tab styling, whether the Future schedule card is
+               shown, the Future date/time required-ness, and the WhatsApp
+               button label. Used by both the mode-tab click handler and the
+               Reset Order flow so the two never drift out of sync. Each mode
+               has its own independent cart, so switching modes also refreshes
+               category badges, the menu's qty controls, and the sidebar's
+               Order Summary / totals. */
+            applyOrderMode(mode) {
+                POSState.orderMode = mode;
+
+                // Each mode now has its own independent item list, so a
+                // category or search term picked under one tab may not
+                // exist under the other — reset both to avoid landing on
+                // an empty "no results" grid after switching tabs.
+                POSState.activeCategory = "ALL";
+                POSState.searchQuery = "";
+                document.getElementById("txt-search").value = "";
+
+                document.querySelectorAll(".mode-tab").forEach(b => {
+                    const isActive = b.dataset.mode === mode;
+                    b.classList.toggle("active", isActive);
+                    b.setAttribute("aria-pressed", isActive ? "true" : "false");
+                });
+
+                const futureCard = document.getElementById("future-schedule-card");
+                const futureDate = document.getElementById("future-date");
+                const futureTime = document.getElementById("future-time");
+                const whatsappLabel = document.getElementById("whatsapp-btn-label");
+
+                futureCard.classList.toggle("visible", mode === "Future");
+                futureDate.required = (mode === "Future");
+                futureTime.required = (mode === "Future");
+
+                if (mode === "Future") {
+                    const { min, max } = getFutureDateBounds();
+                    futureDate.min = min;
+                    futureDate.max = max;
+                    whatsappLabel.textContent = "Schedule Order";
+                } else {
+                    whatsappLabel.textContent = "Place Order";
+                }
+
+                this.renderCategories();
+                this.renderMenu();
+                this.syncTotals();
+            },
+
+            /* ---------- TOTALS & DISCOUNT ---------- */
+            syncTotals() {
+                let uniqueItems = 0, totalQty = 0, subtotal = 0;
+                const previewContainer = document.getElementById("cart-items-preview");
+                previewContainer.innerHTML = "";
+                const cart = POSState.getCart();
+
+                Object.keys(cart).forEach(id => {
+                    const qty = cart[id];
+                    if (qty > 0) {
+                        const item = findItemById(id);
+                        if (!item) return;
+                        uniqueItems++
+                        totalQty += qty;
+                        subtotal += item.price * qty;
+
+                        const li = document.createElement("li");
+                        li.className = "cart-item-row";
+                        li.innerHTML = `<span>${item.name} (x${qty})</span><strong>₹${(item.price * qty).toFixed(2)}</strong>`;
+                        previewContainer.appendChild(li);
+                    }
+                });
+
+                if (uniqueItems === 0) {
+                    previewContainer.innerHTML = `<li class="cart-empty-state"><span class="empty-icon">🛒</span>No items added yet</li>`;
+                }
+
+                // A single shared line above the list for Future Order (one
+                // date/time applies to the whole cart, so showing it once
+                // per item would just repeat the same line N times).
+                const scheduleNote = document.getElementById("cart-schedule-note");
+                if (POSState.orderMode === "Future") {
+                    scheduleNote.classList.add("visible");
+                    if (POSState.schedule.date && POSState.schedule.time) {
+                        const dt = new Date(`${POSState.schedule.date}T${POSState.schedule.time}`);
+                        scheduleNote.innerHTML = `📅 Scheduled for <strong>${dt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</strong>`;
+                    } else {
+                        scheduleNote.innerHTML = `⚠️ Set a delivery date &amp; time above`;
+                    }
+                } else {
+                    scheduleNote.classList.remove("visible");
+                }
+
+                // discount
+                let discountAmount = 0;
+                if (subtotal > 0 && POSState.discount.type) {
+                    discountAmount = POSState.discount.type === "percent"
+                        ? Math.round(subtotal * POSState.discount.value) / 100
+                        : POSState.discount.value;
+                    discountAmount = Math.min(discountAmount, subtotal);
+                } else if (subtotal === 0) {
+                    discountAmount = 0;
+                }
+
+                const effectiveDeliveryFee = POSState.orderType === "Pickup" ? 0 : POSState.deliveryCharge;
+                const grandTotal = subtotal > 0 ? Math.max(0, subtotal - discountAmount) + effectiveDeliveryFee : 0;
+
+                document.getElementById("summary-unique-items").innerText = uniqueItems;
+                document.getElementById("summary-total-qty").innerText = totalQty;
+                document.getElementById("summary-subtotal").innerText = `₹${subtotal.toFixed(2)}`;
+
+                const grandTotalEl = document.getElementById("summary-grand-total");
+                const newGrandTotalText = `₹${grandTotal.toFixed(2)}`;
+                if (this._lastGrandTotal !== undefined && this._lastGrandTotal !== grandTotal) {
+                    grandTotalEl.classList.remove("pop");
+                    void grandTotalEl.offsetWidth;
+                    grandTotalEl.classList.add("pop");
+                }
+                grandTotalEl.innerText = newGrandTotalText;
+                this._lastGrandTotal = grandTotal;
+
+                document.getElementById("lbl-order-no").innerText = POSState.orderId;
+
+                const discountRow = document.getElementById("row-discount");
+                if (discountAmount > 0) {
+                    discountRow.classList.add("visible");
+                    document.getElementById("summary-discount").innerText = `−₹${discountAmount.toFixed(2)}`;
+                    document.getElementById("discount-code-label").innerText = `(${POSState.discount.code})`;
+                } else {
+                    discountRow.classList.remove("visible");
+                }
+
+                const qrTag = document.getElementById("qr-amount-tag");
+                const qrAmountEl = document.getElementById("qr-amount-display");
+                const newQrText = `₹${grandTotal.toFixed(2)}`;
+                if (qrAmountEl.innerText !== newQrText && qrAmountEl.innerText !== "") {
+                    qrAmountEl.classList.remove("pop");
+                    void qrAmountEl.offsetWidth;
+                    qrAmountEl.classList.add("pop");
+                }
+                qrAmountEl.innerText = newQrText;
+                qrTag.classList.toggle("zero", grandTotal === 0);
+                const qrWrapper = document.getElementById("qr-wrapper");
+                if (qrWrapper) qrWrapper.classList.toggle("active", grandTotal > 0);
+
+                // mobile sticky bar
+                const bar = document.getElementById("mobile-cart-bar");
+                bar.classList.toggle("visible", totalQty > 0);
+                document.getElementById("mobile-cart-count").innerText = totalQty;
+                document.getElementById("mobile-cart-total").innerText = `₹${grandTotal.toFixed(2)}`;
+
+                return { uniqueItems, totalQty, subtotal, discountAmount, effectiveDeliveryFee, grandTotal };
+            },
+
+            updateTimestamp() {
+                const el = document.getElementById("lbl-date-time");
+                if (el) el.innerText = new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+            },
+
+            /* ---------- TOASTS ---------- */
+            showToast(message, type = "info") {
+                const container = document.getElementById("toast-container");
+                const toast = document.createElement("div");
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                container.appendChild(toast);
+                setTimeout(() => toast.remove(), 3200);
+            },
+
+            /* ---------- MODAL (replaces window.alert / window.confirm) ---------- */
+            alertModal(title, message) {
+                return this.showModal(title, message, { confirmText: "OK", showCancel: false });
+            },
+            confirmModal(title, message, confirmText = "Confirm") {
+                return this.showModal(title, message, { confirmText, showCancel: true, cancelText: "Cancel" });
+            },
+            showModal(title, message, opts) {
+                const overlay = document.getElementById("modal-overlay");
+                document.getElementById("modal-title").textContent = title;
+                document.getElementById("modal-message").textContent = message;
+                const confirmBtn = document.getElementById("modal-confirm-btn");
+                const cancelBtn = document.getElementById("modal-cancel-btn");
+                confirmBtn.textContent = opts.confirmText || "OK";
+                cancelBtn.style.display = opts.showCancel ? "inline-block" : "none";
+                if (opts.showCancel) cancelBtn.textContent = opts.cancelText || "Cancel";
+                overlay.classList.remove("hidden");
+
+                return new Promise((resolve) => {
+                    const cleanup = (result) => {
+                        overlay.classList.add("hidden");
+                        confirmBtn.removeEventListener("click", onConfirm);
+                        cancelBtn.removeEventListener("click", onCancel);
+                        document.removeEventListener("keydown", onKey);
+                        resolve(result);
+                    };
+                    const onConfirm = () => cleanup(true);
+                    const onCancel = () => cleanup(false);
+                    const onKey = (e) => { if (e.key === "Escape") cleanup(false); };
+                    confirmBtn.addEventListener("click", onConfirm);
+                    cancelBtn.addEventListener("click", onCancel);
+                    document.addEventListener("keydown", onKey);
+                    confirmBtn.focus();
+                });
+            },
+
+            /* ---------- EVENT BINDING ---------- */
+            bindEventHandlers() {
+                document.getElementById("category-pills-container").addEventListener("click", (e) => {
+                    if (e.target.classList.contains("pill")) {
+                        POSState.activeCategory = e.target.dataset.category;
+                        this.renderCategories();
+                        this.renderMenu();
+                    }
+                });
+
+                document.getElementById("txt-search").addEventListener("input", (e) => {
+                    POSState.searchQuery = e.target.value;
+                    this.renderMenu();
+                });
+
+                document.addEventListener("keydown", (e) => {
+                    const activeTag = document.activeElement ? document.activeElement.tagName : "";
+                    if (e.key === "/" && activeTag !== "INPUT" && activeTag !== "TEXTAREA") {
+                        e.preventDefault();
+                        document.getElementById("txt-search").focus();
+                    }
+                });
+
+                document.getElementById("menu-container").addEventListener("click", (e) => {
+                    const titleEl = e.target.closest(".category-title");
+                    if (titleEl && window.matchMedia('(max-width: 768px)').matches) {
+                        titleEl.closest(".category-card").classList.toggle("collapsed");
+                        return;
+                    }
+                    if (e.target.classList.contains("qty-btn")) {
+                        e.target.classList.remove("pulse");
+                        void e.target.offsetWidth;
+                        e.target.classList.add("pulse");
+                        const id = e.target.dataset.id;
+                        const cart = POSState.getCart();
+                        const item = findItemById(id);
+                        const current = cart[id] || 0;
+                        if (e.target.classList.contains("btn-up")) {
+                            cart[id] = current + 1;
+                            if (current === 0) this.showToast(`${item.name} added`, "success");
+                        } else if (e.target.classList.contains("btn-down") && current > 0) {
+                            cart[id] = current - 1;
+                            if (cart[id] === 0) {
+                                delete cart[id];
+                                this.showToast(`${item.name} removed`, "info");
+                            }
+                        }
+                        this.renderCategories();
+                        this.renderMenu();
+                        this.syncTotals();
+                    }
+                });
+
+                document.getElementById("menu-container").addEventListener("change", (e) => {
+                    if (e.target.classList.contains("qty-input")) {
+                        const id = e.target.dataset.id;
+                        const val = parseInt(e.target.value, 10) || 0;
+                        const cart = POSState.getCart();
+                        if (val > 0) {
+                            cart[id] = val;
+                        } else {
+                            delete cart[id];
+                        }
+                        this.renderCategories();
+                        this.renderMenu();
+                        this.syncTotals();
+                    }
+                });
+
+                /* Phone number: digits only, capped at 10, as the customer
+                   types. This is the single shared "Your Details" field —
+                   Today's Order Menu and Future Order both use the same
+                   form, so this restriction applies under every tab. */
+                document.getElementById("cust-phone").addEventListener("input", (e) => {
+                    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                });
+
+                document.getElementById("input-delivery-fee").addEventListener("input", (e) => {
+                    const val = parseFloat(e.target.value);
+                    POSState.deliveryCharge = (!isNaN(val) && val >= 0) ? val : 0;
+                    this.syncTotals();
+                });
+
+                /* ordering mode tabs — Today's Order Menu (Instant) / Future Order */
+                document.getElementById("mode-tabs").addEventListener("click", (e) => {
+                    const btn = e.target.closest(".mode-tab");
+                    if (!btn) return;
+                    this.applyOrderMode(btn.dataset.mode);
+                });
+
+                document.getElementById("future-date").addEventListener("change", (e) => {
+                    const val = e.target.value;
+                    if (val && !isFutureDateWithinWindow(val)) {
+                        e.target.value = "";
+                        POSState.schedule.date = "";
+                        this.showToast("Delivery date must be between tomorrow and 15 days from tomorrow", "error");
+                        this.syncTotals();
+                        return;
+                    }
+                    POSState.schedule.date = val;
+                    this.syncTotals();
+                });
+                document.getElementById("future-time").addEventListener("change", (e) => {
+                    const val = e.target.value;
+                    if (val && !isFutureTimeWithinWindow(val)) {
+                        e.target.value = "";
+                        POSState.schedule.time = "";
+                        this.showToast("Delivery time must be between 9:00 AM and 10:00 PM", "error");
+                        this.syncTotals();
+                        return;
+                    }
+                    POSState.schedule.time = val;
+                    this.syncTotals();
+                });
+
+                /* order type segmented control */
+                document.getElementById("order-type-toggle").addEventListener("click", (e) => {
+                    const btn = e.target.closest("button[data-type]");
+                    if (!btn) return;
+                    POSState.orderType = btn.dataset.type;
+                    document.querySelectorAll("#order-type-toggle button").forEach(b => b.classList.toggle("active", b === btn));
+
+                    const isPickup = POSState.orderType === "Pickup";
+                    document.getElementById("address-fields").classList.toggle("collapsed", isPickup);
+                    document.getElementById("pickup-note").classList.toggle("visible", isPickup);
+                    document.getElementById("row-delivery-fee").style.display = isPickup ? "none" : "table-row";
+                    document.getElementById("cust-door").required = !isPickup;
+                    document.getElementById("input-delivery-fee").disabled = isPickup;
+
+                    this.syncTotals();
+                });
+
+                /* coupon */
+                document.getElementById("btn-apply-coupon").addEventListener("click", () => this.applyCoupon());
+                document.getElementById("input-coupon").addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") { e.preventDefault(); this.applyCoupon(); }
+                });
+
+                document.getElementById("btn-theme").addEventListener("click", () => {
+                    const html = document.documentElement;
+                    const mode = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+                    html.setAttribute("data-theme", mode);
+                    document.getElementById("theme-icon").innerText = mode === "dark" ? "☀️" : "🌙";
+                    document.getElementById("theme-label").innerText = mode === "dark" ? "Light Mode" : "Dark Mode";
+                });
+
+                const sidebar = document.querySelector(".sidebar");
+                const mobileOverlay = document.getElementById("mobile-overlay");
+
+                function openMobileSidebar() {
+                    sidebar.classList.add("mobile-open");
+                    mobileOverlay.classList.add("active");
+                    document.body.style.overflow = "hidden";
+                }
+                function closeMobileSidebar() {
+                    sidebar.classList.remove("mobile-open");
+                    mobileOverlay.classList.remove("active");
+                    document.body.style.overflow = "";
+                }
+
+                document.getElementById("mobile-cart-bar").addEventListener("click", () => {
+                    if (window.matchMedia('(max-width: 768px)').matches) {
+                        openMobileSidebar();
+                    } else {
+                        sidebar.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                });
+
+                mobileOverlay.addEventListener("click", closeMobileSidebar);
+                document.getElementById("sidebar-close-btn").addEventListener("click", closeMobileSidebar);
+
+                sidebar.addEventListener("click", (e) => {
+                    if (["trigger-whatsapp", "trigger-reset"].includes(e.target.id)) {
+                        closeMobileSidebar();
+                    }
+                });
+
+                document.getElementById("trigger-whatsapp").addEventListener("click", () => ExportEngine.sendWhatsApp());
+
+                document.getElementById("btn-update-now").addEventListener("click", () => this.hardReload());
+
+                document.getElementById("trigger-reset").addEventListener("click", async () => {
+                    const ok = await this.confirmModal(
+                        "Reset this order?",
+                        "This clears your cart, your details, and any promo code for a fresh order. This can't be undone.",
+                        "Reset Order"
+                    );
+                    if (!ok) return;
+
+                    document.getElementById("form-customer").reset();
+                    document.getElementById("txt-search").value = "";
+                    document.getElementById("input-delivery-fee").value = "0";
+                    document.getElementById("input-coupon").value = "";
+                    document.getElementById("coupon-feedback").textContent = "";
+                    document.getElementById("coupon-feedback").className = "coupon-feedback";
+
+                    document.querySelectorAll("#order-type-toggle button").forEach(b => b.classList.toggle("active", b.dataset.type === "Delivery"));
+                    document.getElementById("address-fields").classList.remove("collapsed");
+                    document.getElementById("pickup-note").classList.remove("visible");
+                    document.getElementById("row-delivery-fee").style.display = "table-row";
+                    document.getElementById("cust-door").required = true;
+                    document.getElementById("input-delivery-fee").disabled = false;
+
+                    document.getElementById("future-date").value = "";
+                    document.getElementById("future-time").value = "";
+
+                    POSState.searchQuery = "";
+                    POSState.activeCategory = "ALL";
+                    POSState.deliveryCharge = 0;
+                    POSState.orderType = "Delivery";
+                    POSState.schedule = { date: "", time: "" };
+                    POSState.discount = { code: "", type: null, value: 0, label: "" };
+                    POSState.init();
+
+                    // applyOrderMode("Instant") resets tab styling, hides the
+                    // Future schedule card, restores the button label, and
+                    // refreshes categories/menu/totals — the same single path
+                    // used when a tab is clicked, so nothing here repeats it.
+                    UIEngine.applyOrderMode("Instant");
+                    UIEngine.showToast("New order started", "success");
+                    document.getElementById("txt-search").focus();
+                });
+            },
+
+            /* ---------- UPDATE NOW: clear caches/SW and force a fresh load ---------- */
+            async hardReload() {
+                this.showToast("Fetching the latest version…", "info");
+                try {
+                    if (window.caches && caches.keys) {
+                        const names = await caches.keys();
+                        await Promise.all(names.map(n => caches.delete(n)));
+                    }
+                    if (navigator.serviceWorker && navigator.serviceWorker.getRegistrations) {
+                        const regs = await navigator.serviceWorker.getRegistrations();
+                        await Promise.all(regs.map(r => r.unregister()));
+                    }
+                } catch (err) {
+                    console.warn("Cache clear failed:", err);
+                }
+                const url = new URL(window.location.href);
+                url.searchParams.set("_v", Date.now());
+                window.location.replace(url.toString());
+            },
+
+            applyCoupon() {
+                const input = document.getElementById("input-coupon");
+                const feedback = document.getElementById("coupon-feedback");
+                const raw = input.value.trim().toUpperCase();
+
+                if (!raw) {
+                    POSState.discount = { code: "", type: null, value: 0, label: "" };
+                    feedback.textContent = "";
+                    feedback.className = "coupon-feedback";
+                    this.syncTotals();
+                    return;
+                }
+
+                const match = (SETTINGS.coupons || {})[raw];
+                if (!match || match.enabled === false) {
+                    feedback.textContent = "That code isn't valid. Please check with the customer and try again.";
+                    feedback.className = "coupon-feedback error";
+                    this.showToast("Invalid promo code", "error");
+                    return;
+                }
+
+                POSState.discount = { code: raw, type: match.type, value: match.value, label: match.label };
+                feedback.textContent = `Applied — ${match.label}`;
+                feedback.className = "coupon-feedback success";
+                this.showToast(`Promo applied: ${match.label}`, "success");
+                this.syncTotals();
+            }
+        };
+
+        const ExportEngine = {
+            validateInputs() {
+                const customerForm = document.getElementById("form-customer");
+                const invoice = this.compileInvoiceData();
+
+                if (invoice.itemsList.length === 0) {
+                    UIEngine.alertModal("Your cart is empty", "Please add at least one item from the menu before sending, printing, or copying your order.");
+                    return false;
+                }
+                if (!customerForm.checkValidity()) {
+                    customerForm.reportValidity();
+                    UIEngine.alertModal("A few details are missing", "Please fill in your name and a valid 10-digit phone number, plus your door/flat number for delivery orders.");
+                    return false;
+                }
+
+                if (POSState.orderMode === "Future") {
+                    const { date, time } = POSState.schedule;
+                    if (!date || !time) {
+                        UIEngine.alertModal("Delivery date & time needed", "Please choose a delivery date and time for this future order before sending it.");
+                        return false;
+                    }
+                    if (!isFutureDateWithinWindow(date)) {
+                        UIEngine.alertModal("Delivery date out of range", "Delivery date must be between tomorrow and 15 days from tomorrow. Please update it before sending.");
+                        return false;
+                    }
+                    if (!isFutureTimeWithinWindow(time)) {
+                        UIEngine.alertModal("Delivery time out of range", "Delivery time must be between 9:00 AM and 10:00 PM. Please update it before sending.");
+                        return false;
+                    }
+                    const scheduledAt = new Date(`${date}T${time}`);
+                    if (scheduledAt.getTime() <= Date.now()) {
+                        UIEngine.alertModal("Please pick a later time", "The delivery date and time you chose has already passed. Please select a future date and time.");
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+            getCustomerDetails() {
+                return {
+                    name: document.getElementById("cust-name").value.trim(),
+                    phone: document.getElementById("cust-phone").value.trim(),
+                    door: document.getElementById("cust-door").value.trim(),
+                    apart: document.getElementById("cust-apart").value,
+                    notes: document.getElementById("cust-notes").value.trim()
+                };
+            },
+
+            compileInvoiceData() {
+                let itemsList = [];
+                let subtotal = 0;
+                let totalQty = 0;
+                const cart = POSState.getCart();
+
+                Object.keys(cart).forEach(id => {
+                    const qty = cart[id];
+                    if (qty > 0) {
+                        const item = findItemById(id);
+                        if (!item) return;
+                        const total = item.price * qty;
+                        subtotal += total;
+                        totalQty += qty;
+                        itemsList.push({ name: item.name, qty, price: item.price, total });
+                    }
+                });
+
+                let discountAmount = 0;
+                if (subtotal > 0 && POSState.discount.type) {
+                    discountAmount = POSState.discount.type === "percent"
+                        ? Math.round(subtotal * POSState.discount.value) / 100
+                        : POSState.discount.value;
+                    discountAmount = Math.min(discountAmount, subtotal);
+                }
+
+                const deliveryFee = POSState.orderType === "Pickup" ? 0 : POSState.deliveryCharge;
+                const grandTotal = subtotal > 0 ? Math.max(0, subtotal - discountAmount) + deliveryFee : 0;
+
+                return { itemsList, subtotal, totalQty, discountAmount, deliveryFee, grandTotal };
+            },
+
+            printInvoice() {
+                if (!this.validateInputs()) return;
+
+                const customer = this.getCustomerDetails();
+                const invoice = this.compileInvoiceData();
+                const isPickup = POSState.orderType === "Pickup";
+
+                document.getElementById("print-order-no").innerText = POSState.orderId;
+                document.getElementById("print-datetime").innerText = new Date().toLocaleString('en-IN');
+                document.getElementById("print-order-type").innerText = POSState.orderType +
+                    (POSState.orderMode === "Future" && POSState.schedule.date && POSState.schedule.time
+                        ? ` (Future — ${new Date(`${POSState.schedule.date}T${POSState.schedule.time}`).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })})`
+                        : "");
+                document.getElementById("print-cust-info").innerHTML = isPickup
+                    ? `<strong>${customer.name}</strong> (${customer.phone})<br>Self Pickup at Counter`
+                    : `<strong>${customer.name}</strong> (${customer.phone})<br>
+                       Flat/Door: ${customer.door} ${customer.apart ? ', ' + customer.apart : ''}<br>
+                       ${customer.street}`;
+
+                const body = document.getElementById("print-items-body");
+                body.innerHTML = invoice.itemsList.map(item => `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td class="text-right">${item.qty} x ${item.price}</td>
+                        <td class="text-right">₹${item.total.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+
+                document.getElementById("print-total-qty").innerText = invoice.totalQty;
+                const discRow = document.getElementById("print-discount-row");
+                if (invoice.discountAmount > 0) {
+                    discRow.style.display = "flex";
+                    document.getElementById("print-discount").innerText = `−₹${invoice.discountAmount.toFixed(2)} (${POSState.discount.code})`;
+                } else {
+                    discRow.style.display = "none";
+                }
+                document.getElementById("print-delivery").innerText = `₹${invoice.deliveryFee.toFixed(2)}`;
+                document.getElementById("print-grand-total").innerText = `₹${invoice.grandTotal.toFixed(2)}`;
+
+                const safeName = customer.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                const originalTitle = document.title;
+                document.title = `${safeName}_${POSState.orderId}`;
+
+                window.print();
+                document.title = originalTitle;
+            },
+
+            buildOrderMessage() {
+                const customer = this.getCustomerDetails();
+                const invoice = this.compileInvoiceData();
+                const isPickup = POSState.orderType === "Pickup";
+
+                const LINE = `━━━━━━━━━━━━━━━━━━\n`;
+
+                // Greeting — customer talking to the shop
+                let text = `Hello *AMRUTHADHAARANAM*,\n\n`;
+                text += `I'd like to place my order. Here are the details:\n`;
+                text += LINE;
+
+                // Customer details
+                text += `👤 *Name:*   ${customer.name}\n`;
+                text += `📞 *Phone:*  ${customer.phone}\n`;
+                text += `🚚 *Order Mode:* ${isPickup ? '🏠 Self Pickup' : '🛵 Home Delivery'}\n`;
+                if (isPickup) {
+                    text += `   I will collect my order at your counter.\n`;
+                } else {
+                    text += `📍 *Deliver to:*\n`;
+                    text += `   ${customer.door}${customer.apart ? ', ' + customer.apart : ''}\n`;
+                }
+                if (customer.notes) text += `📝 *Notes:* ${customer.notes}\n`;
+
+                if (POSState.orderMode === "Future" && POSState.schedule.date && POSState.schedule.time) {
+                    const scheduledAt = new Date(`${POSState.schedule.date}T${POSState.schedule.time}`);
+                    const formatted = scheduledAt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+                    text += `📅 *This is a FUTURE ORDER*\n`;
+                    text += `   Deliver on: *${formatted}*\n`;
+                }
+                text += LINE;
+
+                // Items
+                text += `🍽️ *My Order:*\n\n`;
+                invoice.itemsList.forEach((item, i) => {
+                    text += `  ${i + 1}. ${item.name}\n`;
+                    text += `     ${item.qty} × ₹${item.price.toFixed(2)} = *₹${item.total.toFixed(2)}*\n\n`;
+                });
+                text += LINE;
+
+                // Bill
+                text += `💰 *Bill Summary:*\n\n`;
+                text += `  Subtotal        :  ₹${invoice.subtotal.toFixed(2)}\n`;
+                if (invoice.discountAmount > 0) {
+                    text += `  Discount (${POSState.discount.code})  : −₹${invoice.discountAmount.toFixed(2)}\n`;
+                }
+                if (!isPickup) {
+                    text += `  Delivery Fee    :  ₹${invoice.deliveryFee.toFixed(2)}\n`;
+                }
+                text += `  ──────────────────\n`;
+                text += `  *Total Payable  :  ₹${invoice.grandTotal.toFixed(2)}*\n`;
+                text += LINE;
+
+                // Closing
+                text += `📌 Ref: _${POSState.orderId}_\n\n`;
+                text += `Kindly confirm my order at the earliest.\n`;
+                text += `Thank you so much!`;
+
+                return text;
+            },
+
+            sendWhatsApp() {
+                if (!this.validateInputs()) return;
+
+                const waNumber = SETTINGS.whatsapp || "";
+                if (!waNumber || waNumber.includes("X")) {
+                    UIEngine.alertModal(
+                        "WhatsApp number not set up yet",
+                        "This site isn't connected to a WhatsApp number yet. Please contact Amruthadhaaranam directly to place this order for now."
+                    );
+                    return;
+                }
+
+                const text = this.buildOrderMessage();
+                const url = `https://wa.me/${waNumber}?text=${encodeURIComponent(text)}`;
+                const newWindow = window.open(url, '_blank', 'noopener,noreferrer');
+                if (newWindow) newWindow.opener = null;
+
+                const toastMsg = POSState.orderMode === "Future"
+                    ? "Opening WhatsApp with your scheduled order pre-filled…"
+                    : "Opening WhatsApp with your order pre-filled…";
+                UIEngine.showToast(toastMsg, "success");
+            },
+
+            payViaUPI() {
+                const invoice = this.compileInvoiceData();
+                if (invoice.grandTotal === 0) {
+                    UIEngine.alertModal("Cart is empty", "Please add at least one item before proceeding to UPI payment.");
+                    return;
+                }
+                const upiLink = `upi://pay?pa=${encodeURIComponent(SETTINGS.upi || '')}&pn=${encodeURIComponent("AMRUTHADHAARANAM")}&am=${invoice.grandTotal.toFixed(2)}&cu=INR&tn=${encodeURIComponent('Order ' + POSState.orderId)}`;
+                if (!SETTINGS.upi) {
+                    UIEngine.alertModal("UPI not configured", "UPI VPA has not been set. Please contact Amruthadhaaranam for payment details.");
+                    return;
+                }
+                const tempLink = document.createElement('a');
+                tempLink.href = upiLink;
+                document.body.appendChild(tempLink);
+                tempLink.click();
+                document.body.removeChild(tempLink);
+            },
+
+            async copyOrderSummary() {
+                if (!this.validateInputs()) return;
+                const text = this.buildOrderMessage();
+                try {
+                    await navigator.clipboard.writeText(text);
+                    UIEngine.showToast("Order text copied — paste it anywhere", "success");
+                } catch (err) {
+                    const temp = document.createElement("textarea");
+                    temp.value = text;
+                    temp.style.position = "fixed";
+                    temp.style.opacity = "0";
+                    document.body.appendChild(temp);
+                    temp.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(temp);
+                    UIEngine.showToast("Order text copied — paste it anywhere", "success");
+                }
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            POSState.init();
+            await loadSettings();
+            UIEngine.init();
+        });
+
+        /* ================================================================
+           CRYSTAL-PANEL TILT
+           Menu cards tilt in real 3D toward the cursor, as if light were
+           catching a faceted glass panel in a brass wire frame. Skipped
+           for touch devices and reduced-motion preference.
+        ================================================================ */
+        (function tiltEffect() {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+            if (reduceMotion || isTouch) return;
+
+            const container = document.getElementById('menu-container');
+            if (!container) return;
+            let activeCard = null;
+
+            container.addEventListener('mousemove', (e) => {
+                const card = e.target.closest('.category-card');
+                if (!card) {
+                    if (activeCard) { activeCard.style.transform = ''; activeCard = null; }
+                    return;
+                }
+                activeCard = card;
+                const rect = card.getBoundingClientRect();
+                const px = (e.clientX - rect.left) / rect.width;
+                const py = (e.clientY - rect.top) / rect.height;
+                const rotateY = (px - 0.5) * 7;
+                const rotateX = (0.5 - py) * 5;
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(3px) translateY(-2px)`;
+            });
+
+            container.addEventListener('mouseleave', (e) => {
+                const card = e.target.closest && e.target.closest('.category-card');
+                if (card) card.style.transform = '';
+                if (!container.contains(e.relatedTarget)) activeCard = null;
+            }, true);
+        })();
+
+        /* ============================================================
+           COPY PROTECTION (deterrent layer)
+           NOTE: This only stops casual copying via mouse/keyboard. It
+           cannot stop someone using browser DevTools' "Sources" tab,
+           view-source via a different browser/proxy, curl/wget on the
+           page URL, or disabling JavaScript — all HTML/CSS/JS sent to
+           a browser is fundamentally visible to that browser. Treat
+           this as a speed bump, not a lock.
+        ============================================================ */
+        (function copyProtection() {
+            const isFormField = (el) =>
+                el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+
+            // Disable right-click context menu (except on form fields, so
+            // customers can still use "paste" etc. while filling details)
+            document.addEventListener("contextmenu", (e) => {
+                if (!isFormField(e.target)) e.preventDefault();
+            });
+
+            // Block selection outside form fields (belt-and-braces; CSS already does most of this)
+            document.addEventListener("selectstart", (e) => {
+                if (!isFormField(e.target)) e.preventDefault();
+            });
+
+            // Block dragging images/text out of the page
+            document.addEventListener("dragstart", (e) => e.preventDefault());
+
+            // Block copy/cut of page content outside form fields
+            document.addEventListener("copy", (e) => {
+                if (!isFormField(e.target)) e.preventDefault();
+            });
+            document.addEventListener("cut", (e) => {
+                if (!isFormField(e.target)) e.preventDefault();
+            });
+
+            // Block common "view/save/inspect source" keyboard shortcuts
+            document.addEventListener("keydown", (e) => {
+                const key = e.key ? e.key.toUpperCase() : "";
+                const ctrlOrCmd = e.ctrlKey || e.metaKey;
+
+                // F12 — DevTools
+                if (e.key === "F12") { e.preventDefault(); return; }
+
+                // Ctrl/Cmd+Shift+I / J / C — DevTools panels
+                if (ctrlOrCmd && e.shiftKey && ["I", "J", "C"].includes(key)) {
+                    e.preventDefault(); return;
+                }
+
+                // Ctrl/Cmd+U — View Source
+                if (ctrlOrCmd && key === "U") { e.preventDefault(); return; }
+
+                // Ctrl/Cmd+S — Save Page
+                if (ctrlOrCmd && key === "S") { e.preventDefault(); return; }
+
+                // Ctrl/Cmd+P — Print (receipt printing uses the on-screen
+                // button which calls window.print() directly, so this is safe to block)
+                if (ctrlOrCmd && key === "P") { e.preventDefault(); return; }
+            });
+        })();
+    </script>
+</body>
+</html>
