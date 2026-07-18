@@ -3,9 +3,9 @@
   "announcement": {
     "enabled": true,
     "type": "offer",
-    "icon": "ð",
-    "blink": true,
-    "text": "Announcement: <strong>Introducing FUTURE ORDER ! You can plan your order item for the next 14 days and Stay confident !!!</strong> !"
+    "icon": "🎉",
+    "text": "Announcement: <strong>Introducing FUTURE ORDER !</strong>",
+    "blink": true
   },
   "whatsapp": "917845387741",
   "upi": "prabhunandhu-2@oksbi",
